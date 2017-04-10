@@ -16,13 +16,13 @@
  
  */
 ArtScreen artScreen;
-int ROWS = 12;
-int COLS = 18;
+int ROWS = 13;
+int COLS = 22;
 int[][] wedgeOrient = new int[ROWS][COLS];
 
 void setup() {
   size(1920, 1080);
-  artScreen = new ArtScreen(this, "EXP024 Tiled", "by Michael Groufsky", "Ported to Art Screen by Andrew Ringler", color(0xff), color(0xcc, 0x22, 0x00));
+  artScreen = new ArtScreen(this, "EXP024 Tiled", "by Michael Groufsky", "Adapted for Screen by Andrew Ringler", color(0xff), color(0xcc, 0x22, 0x00));
 
   for (int i = 0; i < ROWS; i++) {
     for (int j = 0; j < COLS; j++) {
@@ -44,7 +44,18 @@ void draw() {
   }
 
   if (artScreen.motion.movementDetected) {
-    triggerOrientFlip(artScreen.motion.motionPixelX, artScreen.motion.motionPixelY);
+    PImage motionImage = artScreen.motion.motionImage;
+    motionImage.loadPixels();
+    for (int x = 0; x < motionImage.width; x ++ ) {
+      for (int y = 0; y < motionImage.height; y ++ ) {
+        int loc = x + y*motionImage.width; //1D pixel location
+        if (brightness(motionImage.pixels[loc]) > 220) {
+          triggerOrientFlip(artScreen.cameraXToScreen(x), artScreen.cameraYToScreen(y));
+        }
+      }
+    }
+
+    //triggerOrientFlip(artScreen.motion.motionPixelX, artScreen.motion.motionPixelY);
   }
 }
 
@@ -69,7 +80,7 @@ int randomOrient() {
   return int(random(4));
 }
 
-void triggerOrientFlip(int x, int y) {
+void triggerOrientFlip(float x, float y) {
   int i = int(ROWS * y / height);
   int j = int(COLS * x / width);
   wedgeOrient[i][j] = (wedgeOrient[i][j] + 1) % 4;
