@@ -5,6 +5,7 @@ import static com.andrewringler.artscreenworkshop.LoadingScreen.showBlankBackdro
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -19,18 +20,18 @@ public class Main {
 	public Main(File currentDirectory) {
 		executor = new DefaultExecutor();
 		
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			public void run() {
-				CommandLine cmdLine = CommandLine.parse("");
-				try {
-					executor.execute(cmdLine);
-				} catch (ExecuteException e) {
-					LOG.error("Unable to run kill sketches", e);
-				} catch (IOException e) {
-					LOG.error("Unable to run kill sketches", e);
-				}
-			}
-		});
+		//		Runtime.getRuntime().addShutdownHook(new Thread() {
+		//			public void run() {
+		//				CommandLine cmdLine = CommandLine.parse("");
+		//				try {
+		//					executor.execute(cmdLine);
+		//				} catch (ExecuteException e) {
+		//					LOG.error("Unable to run kill sketches", e);
+		//				} catch (IOException e) {
+		//					LOG.error("Unable to run kill sketches", e);
+		//				}
+		//			}
+		//		});
 		
 		showBlankBackdrop();
 		
@@ -41,15 +42,13 @@ public class Main {
 				return new File(current, name).isDirectory();
 			}
 		});
+		Arrays.sort(sketches);
 		for (String sketch : sketches) {
 			try {
 				LOG.info("running " + sketch);
 				
 				File sketchPath = new File(currentDirectory, sketch);
-				//				String line = "/usr/local/bin/processing-java" + " --sketch=" + sketchPath.getPath() + " --present";
-				
-				// mac
-				String line = "open -W " + sketchPath.getPath();
+				String line = "processing-java" + " --sketch=\"" + sketchPath.getPath() + "\" --present live 60000";
 				CommandLine cmdLine = CommandLine.parse(line);
 				int exitStatus = executor.execute(cmdLine);
 				if (exitStatus != 0) {
@@ -72,13 +71,21 @@ public class Main {
 		}
 		
 		while (true) {
-			File currentDirectory;
-			if (args.length == 1) {
-				currentDirectory = new File(args[0]);
-			} else {
-				currentDirectory = new File(System.getProperty("user.dir"));
+			try {
+				File currentDirectory;
+				if (args.length == 1) {
+					currentDirectory = new File(args[0]);
+				} else {
+					currentDirectory = new File(System.getProperty("user.dir"));
+				}
+				new Main(currentDirectory);
+			} catch (Exception e) {
+				LOG.error("Unknown error, lets wait and retry", e);
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException ie) {
+				}
 			}
-			new Main(currentDirectory);
 		}
 	}
 }
