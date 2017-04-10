@@ -47,6 +47,7 @@ public class ArtScreen {
     this.additionalCredits = additionalCredits;
     p.registerMethod("pre", this);
     p.registerMethod("draw", this);
+    p.registerMethod("dispose", this);
 
     if (args != null && args.length != 0 && args[0].equals("live")) {
       // no preview
@@ -65,7 +66,6 @@ public class ArtScreen {
       }
     }
 
-
     video = new Capture(p, CAPTURE_WIDTH, CAPTURE_HEIGHT, (int)fps); 
     video.start(); // if on processing 151, comment this line 
 
@@ -81,6 +81,7 @@ public class ArtScreen {
     pushStyle();
     colorMode(RGB, 255);
     background(0);
+    drawArtworkCaption(titleOfArtwork, artistFullName, additionalCredits);
     popStyle();
 
     noCursor();
@@ -103,6 +104,14 @@ public class ArtScreen {
       // so the next Sketch may start
       exit();
     }
+  }
+
+  // Anything in here will be called automatically when 
+  // the parent sketch shuts down.
+  void dispose() {
+    video.stop();
+    video = null;
+    motion = null;
   }
 
   void drawArtworkCaption(String titleOfArtwork, String artistFullName, String additionalCredits) {

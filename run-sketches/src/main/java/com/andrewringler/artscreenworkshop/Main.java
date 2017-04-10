@@ -20,21 +20,6 @@ public class Main {
 	public Main(File currentDirectory) {
 		executor = new DefaultExecutor();
 		
-		//		Runtime.getRuntime().addShutdownHook(new Thread() {
-		//			public void run() {
-		//				CommandLine cmdLine = CommandLine.parse("");
-		//				try {
-		//					executor.execute(cmdLine);
-		//				} catch (ExecuteException e) {
-		//					LOG.error("Unable to run kill sketches", e);
-		//				} catch (IOException e) {
-		//					LOG.error("Unable to run kill sketches", e);
-		//				}
-		//			}
-		//		});
-		
-		showBlankBackdrop();
-		
 		// http://stackoverflow.com/questions/5125242/java-list-only-subdirectories-from-a-directory-not-files
 		String[] sketches = currentDirectory.list(new FilenameFilter() {
 			@Override
@@ -66,6 +51,7 @@ public class Main {
 		try {
 			System.setProperty("com.apple.macos.useScreenMenuBar", "true");
 			System.setProperty("apple.laf.useScreenMenuBar", "true"); // for older versions of Java
+			showBlankBackdrop();
 		} catch (Exception e) {
 			// ok
 		}

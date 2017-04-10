@@ -16,11 +16,10 @@ int maxLevel = 9;
 
 void setup() {
   size(1920, 1080);  
+  artScreen = new ArtScreen(this, "Cherry Blossom v4", "by Jason Labbe", "Credits to Daniel Shiffman. Ported by Andrew Ringler");
+
   colorMode(HSB, 100);
-
   generateNewTree();
-
-  artScreen = new ArtScreen(this, "Cherry Blossom", "by Jason Labbe", "Credits to Daniel Shiffman. Ported by Andrew Ringler");
 }
 
 void draw() {
