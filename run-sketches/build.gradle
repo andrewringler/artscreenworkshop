@@ -8,7 +8,7 @@ applicationDefaultJvmArgs = ["-Xmx1024M"]
 mainClassName = "com.andrewringler.artscreenworkshop.Main"
 
 group = 'com.andrewringler.artscreenworkshop'
-version = '0.4'
+version = '0.5'
 
 repositories {
  	mavenCentral()

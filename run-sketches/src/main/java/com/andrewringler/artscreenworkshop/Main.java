@@ -2,10 +2,16 @@ package com.andrewringler.artscreenworkshop;
 
 import static com.andrewringler.artscreenworkshop.LoadingScreen.showBlankBackdrop;
 
+import java.awt.AWTException;
+import java.awt.Dimension;
+import java.awt.Robot;
+import java.awt.Toolkit;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Arrays;
+
+import javax.swing.SwingUtilities;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -52,6 +58,20 @@ public class Main {
 			System.setProperty("com.apple.macos.useScreenMenuBar", "true");
 			System.setProperty("apple.laf.useScreenMenuBar", "true"); // for older versions of Java
 			showBlankBackdrop();
+			
+			// move the mouse cursor out of the way
+			// for those brief moments when our splash screen is up
+			SwingUtilities.invokeAndWait(new Runnable() {
+				@Override
+				public void run() {
+					Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+					try {
+						new Robot().mouseMove((int) screenSize.getWidth(), (int) screenSize.getHeight());
+					} catch (AWTException e) {
+						// ignore
+					}
+				}
+			});
 		} catch (Exception e) {
 			// ok
 		}
