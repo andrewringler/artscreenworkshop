@@ -224,7 +224,7 @@ void generateNewTree() {
   subDivide(branches.get(0));
 }
 
-void triggerLeaves(int newX, int newY) {
+void triggerLeaves(float newX, float newY) {
   PVector source = new PVector(newX, newY);
 
   float branchDistThreshold = 300*300;
