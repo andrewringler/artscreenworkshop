@@ -1,0 +1,10 @@
+bin
+apps
+*.zip
+build
+.classpath
+.settings
+.project
+.gradle
+.DS_Store
+*.log

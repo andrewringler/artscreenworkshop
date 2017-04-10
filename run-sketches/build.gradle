@@ -1,0 +1,25 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin:'application'
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+applicationDefaultJvmArgs = ["-Xmx1024M"]
+mainClassName = "com.andrewringler.artscreenworkshop.Main"
+
+group = 'com.andrewringler.artscreenworkshop'
+version = '0.1'
+
+repositories {
+ 	mavenCentral()
+}
+
+dependencies {
+    compile 'com.google.guava:guava:20.0',
+            'org.slf4j:slf4j-api:1.6.1',
+            'colt:colt:1.2.0',
+            'org.apache.commons:commons-exec:1.3'
+            
+    runtime 'ch.qos.logback:logback-classic:1.0.9',
+    			fileTree(dir: 'lib/p3', include: '**/*.jar')
+}
