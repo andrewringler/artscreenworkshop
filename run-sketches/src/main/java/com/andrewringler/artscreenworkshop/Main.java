@@ -16,11 +16,14 @@ import javax.swing.SwingUtilities;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
+import org.apache.commons.exec.ExecuteWatchdog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Main {
 	private static final Logger LOG = LoggerFactory.getLogger(Main.class);
+	private static final int SKETCH_TIMEOUT_MILLIS = 5 * 60 * 1000;
+	private static final int SKETCH_WATCHDOG_KILL_MILLIS = SKETCH_TIMEOUT_MILLIS + 5000;
 	private DefaultExecutor executor;
 	
 	public Main(File currentDirectory) {
@@ -39,8 +42,12 @@ public class Main {
 				LOG.info("running " + sketch);
 				
 				File sketchPath = new File(currentDirectory, sketch);
-				String line = "processing-java" + " --sketch=\"" + sketchPath.getPath() + "\" --present live 60000";
+				String line = "processing-java" + " --sketch=\"" + sketchPath.getPath() + "\" --present live " + SKETCH_TIMEOUT_MILLIS;
 				CommandLine cmdLine = CommandLine.parse(line);
+				
+				ExecuteWatchdog watchdog = new ExecuteWatchdog(SKETCH_WATCHDOG_KILL_MILLIS);
+				executor.setWatchdog(watchdog);
+				
 				int exitStatus = executor.execute(cmdLine);
 				if (exitStatus != 0) {
 					LOG.error("error exit code of " + exitStatus + "running sketch" + sketch);
