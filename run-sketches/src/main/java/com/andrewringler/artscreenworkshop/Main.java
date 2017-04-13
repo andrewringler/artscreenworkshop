@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 
 public class Main {
 	private static final Logger LOG = LoggerFactory.getLogger(Main.class);
-	private static final int SKETCH_TIMEOUT_MILLIS = 5 * 60 * 1000;
+	private static final int SKETCH_TIMEOUT_MILLIS = 1 * 60 * 1000;
 	private static final int SKETCH_WATCHDOG_KILL_MILLIS = SKETCH_TIMEOUT_MILLIS + 5000;
 	private DefaultExecutor executor;
 	
@@ -42,15 +42,19 @@ public class Main {
 				LOG.info("running " + sketch);
 				
 				File sketchPath = new File(currentDirectory, sketch);
-				String line = "processing-java" + " --sketch=\"" + sketchPath.getPath() + "\" --present live " + SKETCH_TIMEOUT_MILLIS;
-				CommandLine cmdLine = CommandLine.parse(line);
-				
-				ExecuteWatchdog watchdog = new ExecuteWatchdog(SKETCH_WATCHDOG_KILL_MILLIS);
-				executor.setWatchdog(watchdog);
-				
-				int exitStatus = executor.execute(cmdLine);
-				if (exitStatus != 0) {
-					LOG.error("error exit code of " + exitStatus + "running sketch" + sketch);
+				if (sketchPath.exists()) {
+					String line = "processing-java" + " --sketch=\"" + sketchPath.getPath() + "\" --present live " + SKETCH_TIMEOUT_MILLIS;
+					CommandLine cmdLine = CommandLine.parse(line);
+					
+					ExecuteWatchdog watchdog = new ExecuteWatchdog(SKETCH_WATCHDOG_KILL_MILLIS);
+					executor.setWatchdog(watchdog);
+					
+					int exitStatus = executor.execute(cmdLine);
+					if (exitStatus != 0) {
+						LOG.error("error exit code of " + exitStatus + "running sketch" + sketch);
+					}
+				} else {
+					LOG.error("ooops directory is missing " + sketchPath.getPath());
 				}
 			} catch (ExecuteException e) {
 				LOG.error("Unable to run sketch " + sketch, e);

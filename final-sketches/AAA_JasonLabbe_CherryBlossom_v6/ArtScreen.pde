@@ -11,7 +11,7 @@ public class ArtScreen {
   PApplet p;
   String titleOfArtwork, artistFullName, additionalCredits;
   color captionTextColor, captionBackgroundColor;
-  int duration = 15000; // small duration for testing
+  int duration = 150000; // small duration for testing
 
   // Captions
   int CAPTION_HEIGHT = 80;
@@ -27,8 +27,6 @@ public class ArtScreen {
   Capture video;    // processing video capture
   int CAPTURE_WIDTH = 1280;
   int CAPTURE_HEIGHT = 720;
-  //int CAPTURE_WIDTH = 640;
-  //int CAPTURE_HEIGHT = 480;
   Motion motion;
 
   // config params
@@ -57,7 +55,7 @@ public class ArtScreen {
     if (args != null && args.length != 0 && args[0].equals("live")) {
       // no preview
     } else {
-      LargeSketchViewer.smallPreview(p); // show smaller preview
+      LargeSketchViewer.smallPreview(p, false, 15, true); // show smaller preview
     }
     if (args != null && args.length >= 2) {
       try {
@@ -102,13 +100,16 @@ public class ArtScreen {
 
   // Method that's called at the end of draw(), but before endDraw().
   void draw() {
-    drawArtworkCaption(titleOfArtwork, artistFullName, additionalCredits);
-
     if (millis() >= duration) {
       // enough time has passed, exit Sketch
       // so the next Sketch may start
       exit();
     }
+
+    pushMatrix();
+    resetMatrix();
+    drawArtworkCaption(titleOfArtwork, artistFullName, additionalCredits);
+    popMatrix();
   }
 
   // Anything in here will be called automatically when 
@@ -137,41 +138,50 @@ public class ArtScreen {
     textFont(openSansSemiBoldItalic22);
     text("“" + titleOfArtwork + "”", width-CAPTION_MARGIN_RIGHT, captionTop);
     textFont(openSansSemiBold22);
-    text("by " + artistFullName, width-CAPTION_MARGIN_RIGHT, captionTop+CAPTION_LINE_HEIGHT);
+    text(artistFullName, width-CAPTION_MARGIN_RIGHT, captionTop+CAPTION_LINE_HEIGHT);
     textFont(openSansSemiBold16);
     text(additionalCredits, width-CAPTION_MARGIN_RIGHT, captionTop+2*CAPTION_LINE_HEIGHT);
     popMatrix();
     popStyle();
   }
-  
-  float cameraXToScreen(float x){
-    return (float)x * scaleX;
+
+  float cameraXToScreen(float x) {
+    return constrain((float)x * scaleX, 0, width);
   }
-  float cameraYToScreen(float y){
-    return (float)y * scaleY;
+  float cameraYToScreen(float y) {
+    return constrain((float)y * scaleY, 0, height);
   }
 }
 
 
 class Motion {
+  private PImage pImage;
+
   int THRESHOLD = 80;
   boolean movementDetected = false;
   int motionPixelX = 0;
   int motionPixelY = 0;
-  PImage pImage;
-  Capture capture;
   float scaleX, scaleY; 
+
+  public PImage motionImage; 
+  public Capture capture;
 
   public Motion(Capture capture, float scaleX, float scaleY) {
     this.capture = capture;
     this.scaleX = scaleX;
     this.scaleY = scaleY;
     pImage = createImage(capture.width, capture.height, RGB); // Create an empty image for staging the image the same size as the video
+    motionImage = createImage(capture.width, capture.height, RGB); // Create an empty image for staging the image the same size as the video
   }
 
   void update() {
+    pushStyle();
+    colorMode(RGB, 255);
+
     pImage.loadPixels();
     capture.loadPixels();
+    PImage  newMotionImage = createImage(capture.width, capture.height, RGB); // Create an empty image for staging the image the same size as the video
+    newMotionImage.loadPixels();
 
     float maxChange = 0;
     boolean newMotion = false;
@@ -193,14 +203,20 @@ class Motion {
           newX = x;
           newY = y;
         }
+        newMotionImage.pixels[loc] = color(constrain(int(change), 0, 255));
       }
     }
 
+    newMotionImage.updatePixels();
+    motionImage = newMotionImage;
+
     movementDetected = newMotion;
-    motionPixelX = round((float)newX * scaleX);
-    motionPixelY =  round((float)newY * scaleY);
-    
+    motionPixelX = constrain(round((float)newX * scaleX), 0, width);
+    motionPixelY =  constrain(round((float)newY * scaleY), 0, height);
+
     // save current frame to old
     pImage.copy(capture, 0, 0, capture.width, capture.height, 0, 0, pImage.width, pImage.height);
+
+    popStyle();
   }
 }

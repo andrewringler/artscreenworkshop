@@ -10,7 +10,8 @@ import largesketchviewer.*;
 public class ArtScreen {
   PApplet p;
   String titleOfArtwork, artistFullName, additionalCredits;
-  int duration = 15000; // small duration for testing
+  color captionTextColor, captionBackgroundColor;
+  int duration = 150000; // small duration for testing
 
   // Captions
   int CAPTION_HEIGHT = 80;
@@ -40,11 +41,13 @@ public class ArtScreen {
 
   float scaleX, scaleY; 
 
-  public ArtScreen(PApplet p, String titleOfArtwork, String artistFullName, String additionalCredits) {
+  public ArtScreen(PApplet p, String titleOfArtwork, String artistFullName, String additionalCredits, color captionTextColor, color captionBackgroundColor) {
     this.p = p;
     this.titleOfArtwork = titleOfArtwork;
     this.artistFullName = artistFullName;
     this.additionalCredits = additionalCredits;
+    this.captionTextColor = captionTextColor;
+    this.captionBackgroundColor = captionBackgroundColor;
     p.registerMethod("pre", this);
     p.registerMethod("draw", this);
     p.registerMethod("dispose", this);
@@ -52,7 +55,7 @@ public class ArtScreen {
     if (args != null && args.length != 0 && args[0].equals("live")) {
       // no preview
     } else {
-      LargeSketchViewer.smallPreview(p); // show smaller preview
+      LargeSketchViewer.smallPreview(p, false, 15, true); // show smaller preview
     }
     if (args != null && args.length >= 2) {
       try {
@@ -69,10 +72,10 @@ public class ArtScreen {
     video = new Capture(p, CAPTURE_WIDTH, CAPTURE_HEIGHT, (int)fps); 
     video.start(); // if on processing 151, comment this line 
 
-    motion = new Motion(video);
-
     scaleX = width / (float)CAPTURE_WIDTH;
     scaleY = height / (float)CAPTURE_HEIGHT;
+
+    motion = new Motion(video, scaleX, scaleY);
 
     openSansSemiBold22 = loadFont("OpenSans-Semibold-22.vlw");
     openSansSemiBoldItalic22 = loadFont("OpenSans-SemiboldItalic-22.vlw");
@@ -97,13 +100,16 @@ public class ArtScreen {
 
   // Method that's called at the end of draw(), but before endDraw().
   void draw() {
-    drawArtworkCaption(titleOfArtwork, artistFullName, additionalCredits);
-
     if (millis() >= duration) {
       // enough time has passed, exit Sketch
       // so the next Sketch may start
       exit();
     }
+
+    pushMatrix();
+    resetMatrix();
+    drawArtworkCaption(titleOfArtwork, artistFullName, additionalCredits);
+    popMatrix();
   }
 
   // Anything in here will be called automatically when 
@@ -124,39 +130,58 @@ public class ArtScreen {
     translate(width, 0);
     scale(-1, 1);
     noStroke();
-    fill(0);
+    fill(captionBackgroundColor);
     rect(width*2f/3f, yTop, width/3.0, CAPTION_HEIGHT);
 
-    fill(255, 255, 255);
+    fill(captionTextColor);
     textAlign(RIGHT, TOP);
     textFont(openSansSemiBoldItalic22);
     text("“" + titleOfArtwork + "”", width-CAPTION_MARGIN_RIGHT, captionTop);
     textFont(openSansSemiBold22);
-    text("by " + artistFullName, width-CAPTION_MARGIN_RIGHT, captionTop+CAPTION_LINE_HEIGHT);
+    text(artistFullName, width-CAPTION_MARGIN_RIGHT, captionTop+CAPTION_LINE_HEIGHT);
     textFont(openSansSemiBold16);
     text(additionalCredits, width-CAPTION_MARGIN_RIGHT, captionTop+2*CAPTION_LINE_HEIGHT);
     popMatrix();
     popStyle();
   }
+
+  float cameraXToScreen(float x) {
+    return constrain((float)x * scaleX, 0, width);
+  }
+  float cameraYToScreen(float y) {
+    return constrain((float)y * scaleY, 0, height);
+  }
 }
 
 
 class Motion {
+  private PImage pImage;
+
   int THRESHOLD = 80;
   boolean movementDetected = false;
   int motionPixelX = 0;
   int motionPixelY = 0;
-  PImage pImage;
-  Capture capture;
+  float scaleX, scaleY; 
 
-  public Motion(Capture capture) {
+  public PImage motionImage; 
+  public Capture capture;
+
+  public Motion(Capture capture, float scaleX, float scaleY) {
     this.capture = capture;
+    this.scaleX = scaleX;
+    this.scaleY = scaleY;
     pImage = createImage(capture.width, capture.height, RGB); // Create an empty image for staging the image the same size as the video
+    motionImage = createImage(capture.width, capture.height, RGB); // Create an empty image for staging the image the same size as the video
   }
 
   void update() {
+    pushStyle();
+    colorMode(RGB, 255);
+
     pImage.loadPixels();
     capture.loadPixels();
+    PImage  newMotionImage = createImage(capture.width, capture.height, RGB); // Create an empty image for staging the image the same size as the video
+    newMotionImage.loadPixels();
 
     float maxChange = 0;
     boolean newMotion = false;
@@ -178,13 +203,20 @@ class Motion {
           newX = x;
           newY = y;
         }
+        newMotionImage.pixels[loc] = color(constrain(int(change), 0, 255));
       }
     }
 
+    newMotionImage.updatePixels();
+    motionImage = newMotionImage;
+
     movementDetected = newMotion;
-    motionPixelX = newX;
-    motionPixelY =  newY;
+    motionPixelX = constrain(round((float)newX * scaleX), 0, width);
+    motionPixelY =  constrain(round((float)newY * scaleY), 0, height);
+
     // save current frame to old
     pImage.copy(capture, 0, 0, capture.width, capture.height, 0, 0, pImage.width, pImage.height);
+
+    popStyle();
   }
 }

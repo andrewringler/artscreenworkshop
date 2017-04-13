@@ -55,7 +55,7 @@ public class ArtScreen {
     if (args != null && args.length != 0 && args[0].equals("live")) {
       // no preview
     } else {
-      LargeSketchViewer.smallPreview(p); // show smaller preview
+      LargeSketchViewer.smallPreview(p, false, 15, true); // show smaller preview
     }
     if (args != null && args.length >= 2) {
       try {
@@ -100,13 +100,16 @@ public class ArtScreen {
 
   // Method that's called at the end of draw(), but before endDraw().
   void draw() {
-    drawArtworkCaption(titleOfArtwork, artistFullName, additionalCredits);
-
     if (millis() >= duration) {
       // enough time has passed, exit Sketch
       // so the next Sketch may start
       exit();
     }
+
+    pushMatrix();
+    resetMatrix();
+    drawArtworkCaption(titleOfArtwork, artistFullName, additionalCredits);
+    popMatrix();
   }
 
   // Anything in here will be called automatically when 
@@ -135,7 +138,7 @@ public class ArtScreen {
     textFont(openSansSemiBoldItalic22);
     text("“" + titleOfArtwork + "”", width-CAPTION_MARGIN_RIGHT, captionTop);
     textFont(openSansSemiBold22);
-    text("by " + artistFullName, width-CAPTION_MARGIN_RIGHT, captionTop+CAPTION_LINE_HEIGHT);
+    text(artistFullName, width-CAPTION_MARGIN_RIGHT, captionTop+CAPTION_LINE_HEIGHT);
     textFont(openSansSemiBold16);
     text(additionalCredits, width-CAPTION_MARGIN_RIGHT, captionTop+2*CAPTION_LINE_HEIGHT);
     popMatrix();
