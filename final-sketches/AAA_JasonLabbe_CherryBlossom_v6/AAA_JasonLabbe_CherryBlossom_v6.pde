@@ -9,6 +9,8 @@
  *
  * Adapted for Art Screen by Andrew Ringler
  */
+import artscreen.*;
+
 ArtScreen artScreen;
 ArrayList<Branch> branches = new ArrayList<Branch>();
 ArrayList<Leaf> leaves = new ArrayList<Leaf>();
@@ -36,7 +38,7 @@ void draw() {
     leaf.display();
     leaf.destroyIfOutBounds();
   }
-  if (artScreen.motion.movementDetected) {
-    triggerLeaves(artScreen.motion.motionPixelX, artScreen.motion.motionPixelY);
+  if (artScreen.movementDetected) {
+    triggerLeaves(artScreen.maxMotionLocation);
   }
 }

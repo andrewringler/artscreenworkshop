@@ -224,13 +224,11 @@ void generateNewTree() {
   subDivide(branches.get(0));
 }
 
-void triggerLeaves(float newX, float newY) {
-  PVector source = new PVector(newX, newY);
-
+void triggerLeaves(PVector source) {
   float branchDistThreshold = 300*300;
 
   for (Branch branch : branches) {
-    float distance = distSquared(newX, newY, branch.end.x, branch.end.y);
+    float distance = distSquared(source.x, source.y, branch.end.x, branch.end.y);
     if (distance > branchDistThreshold) {
       continue;
     }
@@ -247,7 +245,7 @@ void triggerLeaves(float newX, float newY) {
   float leafDistThreshold = 50*50;
 
   for (Leaf leaf : leaves) {
-    float distance = distSquared(newX, newY, leaf.pos.x, leaf.pos.y);
+    float distance = distSquared(source.x, source.y, leaf.pos.x, leaf.pos.y);
     if (distance > leafDistThreshold) {
       continue;
     }

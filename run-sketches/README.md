@@ -1,5 +1,5 @@
 # art screen workshop
     
-Buidl runner:    
+Build the runner:    
 
     gradle distZip

@@ -15,6 +15,8 @@
  Adapted for Art Screen by Andrew Ringler
  
  */
+import artscreen.*;
+
 ArtScreen artScreen;
 int ROWS = 13;
 int COLS = 22;
@@ -43,8 +45,8 @@ void draw() {
     }
   }
 
-  if (artScreen.motion.movementDetected) {
-    PImage motionImage = artScreen.motion.motionImage;
+  if (artScreen.movementDetected) {
+    PImage motionImage = artScreen.motionImage;
     motionImage.loadPixels();
     for (int x = 0; x < motionImage.width; x ++ ) {
       for (int y = 0; y < motionImage.height; y ++ ) {
