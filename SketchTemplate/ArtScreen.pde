@@ -139,7 +139,7 @@ public class ArtScreen {
       }
 
       pgForSavingScreen.updatePixels();
-      pgForSavingScreen.save(year() + "-" + month() + "-" + day() + "_" + hour() + "-" + minute() + "-" + second() + "_" + getClass().getSimpleName() + ".png");
+      pgForSavingScreen.save("saved/" + year() + "-" + month() + "-" + day() + "_" + hour() + "-" + minute() + "-" + second() + "_" + getClass().getSimpleName() + ".png");
       pgForSavingScreen.endDraw();
     }
   }
