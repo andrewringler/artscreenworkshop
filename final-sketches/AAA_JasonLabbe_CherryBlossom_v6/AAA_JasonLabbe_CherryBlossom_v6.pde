@@ -4,6 +4,7 @@
  * 
  * https://www.openprocessing.org/sketch/383911
  * jasonlabbe3d.com
+ * September 24th, 2016
  *
  * Credits: Daniel Shiffman's tree fractal series (https://www.youtube.com/watch?v=fcdNSZ9IzJM)
  *
@@ -18,7 +19,7 @@ int maxLevel = 9;
 
 void setup() {
   size(1920, 1080);  
-  artScreen = new ArtScreen(this, "Cherry Blossom v6", "by Jason Labbe", "Credits to Daniel Shiffman. Adapted for Screen by Andrew Ringler", color(0, 0, 0), color(255, 255, 255));
+  artScreen = new ArtScreen(this, "Cherry Blossom v6, 2016", "by Jason Labbe", "Credits to Daniel Shiffman. Adapted for Screen by Andrew Ringler", color(0, 0, 0), color(255, 255, 255));
 
   colorMode(HSB, 100);
   generateNewTree();
