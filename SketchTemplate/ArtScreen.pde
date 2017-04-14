@@ -11,7 +11,9 @@ public class ArtScreen {
   PApplet p;
   String titleOfArtwork, artistFullName, additionalCredits;
   color captionTextColor, captionBackgroundColor;
-  int duration = 150000; // small duration for testing
+  int duration = 15000; // small duration for testing
+  int saveFrameAtMillis;
+  boolean saved = false;
 
   // Captions
   int CAPTION_HEIGHT = 80;
@@ -39,7 +41,9 @@ public class ArtScreen {
   float fps = 30;
   int videotex = 3;
 
-  float scaleX, scaleY; 
+  float scaleX, scaleY;
+
+  PGraphics pgForSavingScreen;
 
   public ArtScreen(PApplet p, String titleOfArtwork, String artistFullName, String additionalCredits, color captionTextColor, color captionBackgroundColor) {
     this.p = p;
@@ -50,6 +54,7 @@ public class ArtScreen {
     this.captionBackgroundColor = captionBackgroundColor;
     p.registerMethod("pre", this);
     p.registerMethod("draw", this);
+    p.registerMethod("post", this);    
     p.registerMethod("dispose", this);
 
     if (args != null && args.length != 0 && args[0].equals("live")) {
@@ -74,6 +79,10 @@ public class ArtScreen {
 
     scaleX = width / (float)CAPTURE_WIDTH;
     scaleY = height / (float)CAPTURE_HEIGHT;
+
+    /* for saving frames, for documentation */
+    saveFrameAtMillis = int(duration / 2.0); // safe frame mid-way through our run
+    pgForSavingScreen = createGraphics(width, height);
 
     motion = new Motion(video, scaleX, scaleY);
 
@@ -110,6 +119,29 @@ public class ArtScreen {
     resetMatrix();
     drawArtworkCaption(titleOfArtwork, artistFullName, additionalCredits);
     popMatrix();
+  }
+
+  // Method called after draw has completed and the frame is done. No drawing allowed.
+  void post() {
+    if (!saved && millis() > saveFrameAtMillis) {
+      saved = true;
+      pgForSavingScreen.beginDraw();
+      pgForSavingScreen.loadPixels();
+      loadPixels();
+      for (int x = 0; x < width; x ++ ) {
+        for (int y = 0; y < height; y ++ ) {
+          /* copy current display to our staging graphics
+           * mirroring the image in the process 
+           * https://processing.org/discourse/beta/num_1220788246.html
+           */
+          pgForSavingScreen.pixels[y*width+x] = pixels[(width - x - 1) + y*width]; // Reversing x to mirror the image
+        }
+      }
+
+      pgForSavingScreen.updatePixels();
+      pgForSavingScreen.save(year() + "-" + month() + "-" + day() + "_" + hour() + "-" + minute() + "-" + second() + "_" + getClass().getSimpleName() + ".png");
+      pgForSavingScreen.endDraw();
+    }
   }
 
   // Anything in here will be called automatically when 
