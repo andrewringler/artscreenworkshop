@@ -14,6 +14,8 @@ import static processing.core.PConstants.RIGHT;
 import static processing.core.PConstants.TOP;
 
 import java.awt.Rectangle;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 // https://github.com/atduskgreg/opencv-processing
 import gab.opencv.OpenCV;
@@ -59,14 +61,16 @@ public class ArtScreen {
 	private final OpenCV opencv;
 	private static final int IMG_PROCESSING_W = CAPTURE_WIDTH / 2;
 	private static final int IMG_PROCESSING_H = CAPTURE_HEIGHT / 2;
-	private final PImage openCVProcessingFrame; // frame to perform image processing on
+	private final Executor opencvProcessingThread = Executors.newFixedThreadPool(1);
+	private boolean openCVReady = true;
 	
-	private final float scaleX, scaleY;
+	private final float screenToCaptureRatioWidth, screenToCaptureRatioHeight;
+	private final float screenToOpenCVRatioWidth, screenToOpenCVRatioHeight;
 	
 	private final PGraphics pgForSavingScreen;
 	
 	// Public variables sketches should access
-	public Rectangle[] faces = new Rectangle[] {}; // initially empty, no faces
+	public Face[] faces = new Face[] {}; // initially empty, no faces
 	public PImage motionImage;
 	public boolean movementDetected = false;
 	public PVector maxMotionLocation = new PVector(0, 0);
@@ -93,13 +97,15 @@ public class ArtScreen {
 		// OpenCV face detection
 		opencv = new OpenCV(p, IMG_PROCESSING_W, IMG_PROCESSING_H); // do image processing on smaller image
 		opencv.loadCascade(OpenCV.CASCADE_FRONTALFACE);
-		openCVProcessingFrame = p.createImage(IMG_PROCESSING_W, IMG_PROCESSING_H, RGB);
 		
 		video = new Capture(p, CAPTURE_WIDTH, CAPTURE_HEIGHT, (int) CAPTURE_FPS);
 		video.start(); // if on processing 151, comment this line 
 		
-		scaleX = p.width / (float) CAPTURE_WIDTH;
-		scaleY = p.height / (float) CAPTURE_HEIGHT;
+		screenToCaptureRatioWidth = p.width / (float) CAPTURE_WIDTH;
+		screenToCaptureRatioHeight = p.height / (float) CAPTURE_HEIGHT;
+		
+		screenToOpenCVRatioWidth = p.width / (float) IMG_PROCESSING_W;
+		screenToOpenCVRatioHeight = p.height / (float) IMG_PROCESSING_H;
 		
 		/* for saving frames, for documentation */
 		saveFrameAtMillis = (int) (duration / 2.0); // safe frame mid-way through our run
@@ -141,8 +147,25 @@ public class ArtScreen {
 			video.read();
 			motionUpdates();
 			
-			// make a copy of the video frame, scaled down to the small size we want for image processing
-			openCVProcessingFrame.copy(video, 0, 0, video.width, video.height, 0, 0, IMG_PROCESSING_W, IMG_PROCESSING_H);
+			/*
+			 * make a copy of the video frame, scaled down to the small size we want for image processing
+			 * work with a different copy, in case the thread is processing the current copy
+			 * only process on occasion, it can be slow
+			 */
+			try {
+				if (openCVReady) {
+					openCVReady = false;
+					PImage newOpenCVProcessingFrame = p.createImage(IMG_PROCESSING_W, IMG_PROCESSING_H, RGB);
+					newOpenCVProcessingFrame.copy(video, 0, 0, video.width, video.height, 0, 0, IMG_PROCESSING_W, IMG_PROCESSING_H);
+					opencvProcessingThread.execute(new Runnable() {
+						public void run() {
+							detectFaces(newOpenCVProcessingFrame);
+						}
+					});
+				}
+			} catch (Exception e) {
+				// ignore
+			}
 		}
 	}
 	
@@ -154,21 +177,26 @@ public class ArtScreen {
 			p.exit();
 		}
 		
-		// run face detection on occassion, it is slow
-		//if (frameCount % 20 == 0) {
-		//  thread("artScreen.detectFaces");
-		//}
-		
 		p.pushMatrix();
 		p.resetMatrix();
 		drawArtworkCaption(titleOfArtwork, artistFullName, additionalCredits);
 		p.popMatrix();
 	}
 	
-	void detectFaces() {
-		/* run openCV face detection on the current video frame */
-		opencv.loadImage(openCVProcessingFrame);
-		faces = opencv.detect();
+	/* run openCV face detection on the current video frame */
+	private void detectFaces(PImage frameToProcess) {
+		opencv.loadImage(frameToProcess);
+		Rectangle[] facesRectangles = opencv.detect();
+		// convert to actually screen coordinates
+		Face[] newFaces = new Face[facesRectangles.length];
+		for (int i = 0; i < newFaces.length; i++) {
+			Rectangle faceRect = facesRectangles[i];
+			// scale and mirror
+			PVector newLoc = new PVector(p.width - faceRect.x * screenToOpenCVRatioWidth - faceRect.width, faceRect.y * screenToOpenCVRatioHeight);
+			newFaces[i] = new Face(newLoc, faceRect.width * screenToOpenCVRatioWidth, faceRect.height * screenToOpenCVRatioHeight);
+		}
+		faces = newFaces;
+		openCVReady = true;
 	}
 	
 	// Method called after draw has completed and the frame is done. No drawing allowed.
@@ -228,11 +256,11 @@ public class ArtScreen {
 	}
 	
 	public float cameraXToScreen(float x) {
-		return constrain((float) x * scaleX, 0, p.width);
+		return constrain((float) x * screenToCaptureRatioWidth, 0, p.width);
 	}
 	
 	public float cameraYToScreen(float y) {
-		return constrain((float) y * scaleY, 0, p.height);
+		return constrain((float) y * screenToCaptureRatioHeight, 0, p.height);
 	}
 	
 	private void motionUpdates() {
@@ -272,8 +300,8 @@ public class ArtScreen {
 		motionImage = newMotionImage;
 		
 		movementDetected = newMotion;
-		float motionPixelX = constrain(round((float) newX * scaleX), 0, p.width);
-		float motionPixelY = constrain(round((float) newY * scaleY), 0, p.height);
+		float motionPixelX = constrain(round((float) newX * screenToCaptureRatioWidth), 0, p.width);
+		float motionPixelY = constrain(round((float) newY * screenToCaptureRatioHeight), 0, p.height);
 		maxMotionLocation = new PVector(motionPixelX, motionPixelY);
 		
 		// save current frame to old
