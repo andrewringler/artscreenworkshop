@@ -9,6 +9,7 @@ import static processing.core.PApplet.month;
 import static processing.core.PApplet.round;
 import static processing.core.PApplet.second;
 import static processing.core.PApplet.year;
+import static processing.core.PConstants.ALPHA;
 import static processing.core.PConstants.RGB;
 import static processing.core.PConstants.RIGHT;
 import static processing.core.PConstants.TOP;
@@ -269,7 +270,7 @@ public class ArtScreen {
 		
 		pImage.loadPixels();
 		video.loadPixels();
-		PImage newMotionImage = p.createImage(video.width, video.height, RGB); // Create an empty image for staging the image the same size as the video
+		PImage newMotionImage = p.createImage(video.width, video.height, ALPHA); // Create an empty image for staging the image the same size as the video
 		newMotionImage.loadPixels();
 		
 		float maxChange = 0;
