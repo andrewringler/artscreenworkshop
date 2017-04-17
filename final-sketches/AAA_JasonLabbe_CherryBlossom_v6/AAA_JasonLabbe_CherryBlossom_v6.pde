@@ -40,14 +40,39 @@ void draw() {
     leaf.destroyIfOutBounds();
   }
 
+  calculateBounds();
+
+  //if (artScreen.movementDetected) {
+  //  for (MotionPixel m : artScreen.top100MotionPixels) {
+  //    if (m.location.x > treeLeft && m.location.x < treeRight && m.location.y > treeTop && m.location.y < treeBottom) {
+  //      triggerLeaves(new PVector(artScreen.cameraXToScreen(m.location.x), artScreen.cameraYToScreen(m.location.y)));
+  //    }
+  //  }
+  //}
+
+//  artScreen.motionImageFull.loadPixels();
+//  for (int x = int(treeLeft); x < int(treeRight); x++) {
+//    for (int y = int(treeTop); y < int(treeBottom); y++) {
+//      int loc = x + y * width; //1D pixel location
+//      if (alpha(artScreen.motionImageFull.pixels[loc]) > 220) {
+//        triggerLeaves(new PVector(x, y));
+//      }
+//    }
+//  }
+
   if (artScreen.movementDetected) {
-    for (MotionPixel m : artScreen.top100MotionPixels) {
-      triggerLeaves(new PVector(artScreen.cameraXToScreen(m.location.x), artScreen.cameraYToScreen(m.location.y)));
+    //for (MotionPixel m : artScreen.top100MotionPixels) {
+    //  triggerLeaves(new PVector(artScreen.cameraXToScreen(m.location.x), artScreen.cameraYToScreen(m.location.y)));
+    //}
+    for (int i=0; i<2 && i<artScreen.top100MotionPixels.length; i++) {
+      MotionPixel m = artScreen.top100MotionPixels[i];
+      //triggerLeaves(new PVector(artScreen.cameraXToScreen(m.location.x), artScreen.cameraYToScreen(m.location.y)));
+      triggerLeaves(new PVector(m.location.x, m.location.y));
     }
   }
 
 
-  //if (artScreen.movementDetected) {
-  //  triggerLeaves(artScreen.maxMotionLocation);
-  //}
+  if (artScreen.movementDetected) {
+    triggerLeaves(artScreen.maxMotionLocation);
+  }
 }
