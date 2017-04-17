@@ -10,7 +10,7 @@ color silhouetteColor;
 int timeSinceColorChange;
 
 void setup() {
-  size(1920, 1080);
+  size(1920, 1080, P3D);
   artScreen = new ArtScreen(this, "Silhouette, 2017", "by Andrew Ringler", "Create art for this screen, take a free class! Info at artscreenworkshop.org", color(255), color(0));
   silhouette = createImage(artScreen.motionImage.width, artScreen.motionImage.height, ARGB);
   

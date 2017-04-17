@@ -45,7 +45,7 @@ public class Text {
 		p.fill(captionTextColor);
 		p.textAlign(RIGHT, TOP);
 		p.textFont(openSansSemiBoldItalic22);
-		p.text("“" + titleOfArtwork + "”", p.width - CAPTION_MARGIN_RIGHT, captionTop);
+		p.text(titleOfArtwork, p.width - CAPTION_MARGIN_RIGHT, captionTop);
 		p.textFont(openSansSemiBold22);
 		p.text(artistFullName, p.width - CAPTION_MARGIN_RIGHT, captionTop + CAPTION_LINE_HEIGHT);
 		p.textFont(openSansSemiBold16);

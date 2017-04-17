@@ -8,7 +8,7 @@ ArtScreen artScreen;
 
 void setup() {
   size(1920, 1080);
-  artScreen = new ArtScreen(this, "Faces", "by Andrew", "", color(0, 0, 0), color(255, 255, 255));
+  artScreen = new ArtScreen(this, "“Faces”, 2017", "by Andrew Ringler", "", color(255), color(0, 0));
 }
 
 void draw() {
