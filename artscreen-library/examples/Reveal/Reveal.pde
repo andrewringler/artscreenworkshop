@@ -39,8 +39,8 @@ void draw() {
   fadingMask.loadPixels();
   for (int i=0; i<motionMask.pixels.length; i++) {
     // new mask is the current motion mask, plus some aspect of the next mask
-    //fadingMask.pixels[i] = color(constrain(round(blue(motionMask.pixels[i]) + blue(fadingMask.pixels[i])*.5f), 0, 255));
-    fadingMask.pixels[i] = color(alpha(motionMask.pixels[i]), 0, 255);
+    fadingMask.pixels[i] = color(constrain(int(alpha(motionMask.pixels[i]) + alpha(fadingMask.pixels[i])*.2f), 0, 255));
+    //fadingMask.pixels[i] = color(blue(motionMask.pixels[i]), 0, 255);
   }
   fadingMask.updatePixels();
 

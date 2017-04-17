@@ -226,6 +226,7 @@ void generateNewTree() {
 
 void triggerLeaves(PVector source) {
   float branchDistThreshold = 300*300;
+  //float branchDistThreshold = 20;
 
   for (Branch branch : branches) {
     float distance = distSquared(source.x, source.y, branch.end.x, branch.end.y);
@@ -236,13 +237,14 @@ void triggerLeaves(PVector source) {
     PVector explosion = new PVector(branch.end.x, branch.end.y);
     explosion.sub(source);
     explosion.normalize();
-    //float mult = map(distance, 0, branchDistThreshold, 10.0, 1.0); // java mode
-    float mult = map(distance, 0, branchDistThreshold, 6.0, 1.0); // js mode
+    float mult = map(distance, 0, branchDistThreshold, 10.0, 1.0); // java mode
+    //float mult = map(distance, 0, branchDistThreshold, 6.0, 1.0); // js mode
     explosion.mult(mult);
     branch.applyForce(explosion);
   }
 
   float leafDistThreshold = 50*50;
+  //float leafDistThreshold = 5;
 
   for (Leaf leaf : leaves) {
     float distance = distSquared(source.x, source.y, leaf.pos.x, leaf.pos.y);

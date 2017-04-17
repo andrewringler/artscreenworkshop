@@ -39,7 +39,15 @@ void draw() {
     leaf.display();
     leaf.destroyIfOutBounds();
   }
+
   if (artScreen.movementDetected) {
-    triggerLeaves(artScreen.maxMotionLocation);
+    for (MotionPixel m : artScreen.top100MotionPixels) {
+      triggerLeaves(new PVector(artScreen.cameraXToScreen(m.location.x), artScreen.cameraYToScreen(m.location.y)));
+    }
   }
+
+
+  //if (artScreen.movementDetected) {
+  //  triggerLeaves(artScreen.maxMotionLocation);
+  //}
 }

@@ -15,7 +15,7 @@ import static processing.core.PConstants.RIGHT;
 import static processing.core.PConstants.TOP;
 
 import java.awt.Rectangle;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 // https://github.com/atduskgreg/opencv-processing
@@ -26,9 +26,16 @@ import processing.core.PFont;
 import processing.core.PGraphics;
 import processing.core.PImage;
 import processing.core.PVector;
+import processing.event.KeyEvent;
 // https://processing.org/reference/libraries/video/Capture.html
 import processing.video.Capture;
 
+/**
+ * ArtScreen is required to publish your art to
+ * the interactive screen.
+ * 
+ * @example Empty
+ */
 public class ArtScreen {
 	public static final String VERSION = "##library.prettyVersion##";
 	private static final int DEFAULT_DURATION = 60 * 1000;
@@ -40,6 +47,7 @@ public class ArtScreen {
 	private final int saveFrameAtMillis;
 	
 	private boolean saved = false;
+	private boolean debug = false;
 	
 	// Captions
 	private static final int CAPTION_HEIGHT = 80;
@@ -62,7 +70,7 @@ public class ArtScreen {
 	private final OpenCV opencv;
 	private static final int IMG_PROCESSING_W = CAPTURE_WIDTH / 2;
 	private static final int IMG_PROCESSING_H = CAPTURE_HEIGHT / 2;
-	private final Executor opencvProcessingThread = Executors.newFixedThreadPool(1);
+	private final ExecutorService opencvProcessingThread = Executors.newFixedThreadPool(1);
 	private boolean openCVReady = true;
 	
 	private final float screenToCaptureRatioWidth, screenToCaptureRatioHeight;
@@ -73,8 +81,10 @@ public class ArtScreen {
 	// Public variables sketches should access
 	public Face[] faces = new Face[] {}; // initially empty, no faces
 	public PImage motionImage;
+	public PImage motionImageFull;
 	public boolean movementDetected = false;
 	public PVector maxMotionLocation = new PVector(0, 0);
+	public MotionPixel[] top100MotionPixels = new MotionPixel[] {};
 	
 	public ArtScreen(PApplet p, String titleOfArtwork, String artistFullName, String additionalCredits, int captionTextColor, int captionBackgroundColor) {
 		this.p = p;
@@ -87,6 +97,7 @@ public class ArtScreen {
 		p.registerMethod("draw", this);
 		p.registerMethod("post", this);
 		p.registerMethod("dispose", this);
+		p.registerMethod("keyEvent", this);
 		
 		if (p.args != null && p.args.length != 0 && p.args[0].equals("live")) {
 			// no preview
@@ -112,7 +123,7 @@ public class ArtScreen {
 		saveFrameAtMillis = (int) (duration / 2.0); // safe frame mid-way through our run
 		pgForSavingScreen = p.createGraphics(p.width, p.height);
 		
-		motionImage = p.createImage(CAPTURE_WIDTH, CAPTURE_HEIGHT, RGB);
+		motionImage = p.createImage(CAPTURE_WIDTH, CAPTURE_HEIGHT, ALPHA);
 		pImage = p.createImage(CAPTURE_WIDTH, CAPTURE_HEIGHT, RGB);
 		
 		openSansSemiBold22 = p.loadFont("OpenSans-Semibold-22.vlw");
@@ -181,7 +192,18 @@ public class ArtScreen {
 		p.pushMatrix();
 		p.resetMatrix();
 		drawArtworkCaption(titleOfArtwork, artistFullName, additionalCredits);
+		drawDebugInfo();
 		p.popMatrix();
+	}
+	
+	// Called when a key event occurs in the parent applet. 
+	// Drawing is allowed because key events are queued, unless the sketch has called noLoop().
+	public void keyEvent(KeyEvent e) {
+		switch (e.getAction()) {
+			case KeyEvent.RELEASE:
+				debug = !debug;
+				break;
+		}
 	}
 	
 	/* run openCV face detection on the current video frame */
@@ -227,6 +249,7 @@ public class ArtScreen {
 	// Anything in here will be called automatically when 
 	// the parent sketch shuts down.
 	public void dispose() {
+		opencvProcessingThread.shutdownNow();
 		video.stop();
 		video = null;
 	}
@@ -256,6 +279,13 @@ public class ArtScreen {
 		p.popStyle();
 	}
 	
+	private void drawDebugInfo() {
+		// draw change amount at every motion pixel
+		for (MotionPixel motionPixel : top100MotionPixels) {
+			p.text(motionPixel.changeAmount, cameraXToScreen(motionPixel.location.x), cameraXToScreen(motionPixel.location.y));
+		}
+	}
+	
 	public float cameraXToScreen(float x) {
 		return constrain((float) x * screenToCaptureRatioWidth, 0, p.width);
 	}
@@ -272,6 +302,8 @@ public class ArtScreen {
 		video.loadPixels();
 		PImage newMotionImage = p.createImage(video.width, video.height, ALPHA); // Create an empty image for staging the image the same size as the video
 		newMotionImage.loadPixels();
+		
+		MotionPixels motionPixels = new MotionPixels();
 		
 		float maxChange = 0;
 		boolean newMotion = false;
@@ -293,9 +325,13 @@ public class ArtScreen {
 					newX = x;
 					newY = y;
 				}
-				newMotionImage.pixels[loc] = p.color(constrain((int) (change), 0, 255));
+				byte changeB = (byte) constrain((int) (change), 0, 255);
+				newMotionImage.pixels[loc] = p.color(changeB);
+				motionPixels.add(new MotionPixel(new PVector(x, y), changeB));
 			}
 		}
+		
+		top100MotionPixels = motionPixels.toArray();
 		
 		newMotionImage.updatePixels();
 		motionImage = newMotionImage;
