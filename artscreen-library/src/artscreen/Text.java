@@ -34,7 +34,11 @@ public class Text {
 		
 		p.pushStyle();
 		p.pushMatrix();
-		p.resetMatrix();
+		if (p.sketchRenderer() == p.P3D) {
+			p.camera(); // https://github.com/processing/processing/issues/2128
+		} else {
+			p.resetMatrix();
+		}
 		p.colorMode(RGB, 255);
 		p.translate(p.width, 0);
 		p.scale(-1, 1);

@@ -1,6 +1,7 @@
 package artscreen;
 
 import static processing.core.PApplet.constrain;
+import static processing.core.PApplet.println;
 import static processing.core.PApplet.round;
 import static processing.core.PConstants.RGB;
 
@@ -64,7 +65,20 @@ public class ArtScreen {
 		
 		duration = getDuration(p);
 		
-		cam = new Capture(p, DEFAULT_CAPTURE_WIDTH, DEFAULT_CAPTURE_HEIGHT, (int) DEFAULT_CAPTURE_FPS);
+		String[] availableCameras = Capture.list();
+		if (availableCameras.length == 0) {
+			println("No cameras found. Exiting.");
+			p.exit();
+		}
+		String requestedCamera = availableCameras[0];
+		String partialCameraName = "size=" + DEFAULT_CAPTURE_WIDTH + "x" + DEFAULT_CAPTURE_HEIGHT + ",fps=" + DEFAULT_CAPTURE_FPS;
+		for (String camera : availableCameras) {
+			if (camera.contains(partialCameraName)) {
+				requestedCamera = camera;
+				break;
+			}
+		}
+		cam = new Capture(p, requestedCamera);
 		cam.start(); // if on processing 151, comment this line 
 		camSmall = p.createImage(cam.width / 4, cam.height / 4, RGB);
 		camSmallMirror = p.createImage(cam.width / 4, cam.height / 4, RGB);
