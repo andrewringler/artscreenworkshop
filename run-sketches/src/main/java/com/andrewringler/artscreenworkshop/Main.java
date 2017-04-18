@@ -43,7 +43,7 @@ public class Main {
 				
 				File sketchPath = new File(currentDirectory, sketch);
 				if (sketchPath.exists()) {
-					String line = "processing-java" + " --sketch=\"" + sketchPath.getPath() + "\" --present live " + SKETCH_TIMEOUT_MILLIS;
+					String line = "processing-java" + " --sketch=\"" + sketchPath.getPath() + "\" --present nopreview " + SKETCH_TIMEOUT_MILLIS;
 					CommandLine cmdLine = CommandLine.parse(line);
 					
 					ExecuteWatchdog watchdog = new ExecuteWatchdog(SKETCH_WATCHDOG_KILL_MILLIS);

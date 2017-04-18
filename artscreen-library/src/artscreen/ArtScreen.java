@@ -4,13 +4,10 @@ import static processing.core.PApplet.constrain;
 import static processing.core.PApplet.round;
 import static processing.core.PConstants.RGB;
 
-import largesketchviewer.LargeSketchViewer;
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
 import processing.event.KeyEvent;
-// https://processing.org/reference/libraries/video/Capture.html
-import processing.video.Capture;
 
 /**
  * ArtScreen is required to publish your art to
@@ -24,7 +21,6 @@ public class ArtScreen {
 	
 	private final PApplet p;
 	
-	final ComputerVision computerVision;
 	final ScreenCapture screenCapture;
 	final Text text;
 	final Debug debug;
@@ -35,12 +31,10 @@ public class ArtScreen {
 	private final int duration;
 	
 	// Video Processing
-	private Capture cam; // processing video capture
 	private final PImage camSmall;
 	private final PImage camSmallMirror;
-	private static final int DEFAULT_CAPTURE_WIDTH = 1280;
-	private static final int DEFAULT_CAPTURE_HEIGHT = 720;
-	private static final float DEFAULT_CAPTURE_FPS = 30;
+	public static final int DEFAULT_CAPTURE_WIDTH = 1280;
+	public static final int DEFAULT_CAPTURE_HEIGHT = 720;
 	
 	public static final int IMG_PROCESSING_W = DEFAULT_CAPTURE_WIDTH / 2;
 	public static final int IMG_PROCESSING_H = DEFAULT_CAPTURE_HEIGHT / 2;
@@ -64,26 +58,17 @@ public class ArtScreen {
 		
 		duration = getDuration(p);
 		
-		cam = new Capture(p, DEFAULT_CAPTURE_WIDTH, DEFAULT_CAPTURE_HEIGHT, (int) DEFAULT_CAPTURE_FPS);
-		cam.start(); // if on processing 151, comment this line 
-		camSmall = p.createImage(cam.width / 4, cam.height / 4, RGB);
-		camSmallMirror = p.createImage(cam.width / 4, cam.height / 4, RGB);
+		camSmall = p.createImage(DEFAULT_CAPTURE_WIDTH / 4, DEFAULT_CAPTURE_HEIGHT / 4, RGB);
+		camSmallMirror = p.createImage(DEFAULT_CAPTURE_WIDTH / 4, DEFAULT_CAPTURE_HEIGHT / 4, RGB);
 		
-		computerVision = new ComputerVision(this, p, cam);
 		screenCapture = new ScreenCapture(this, p, duration);
 		text = new Text(p);
 		debug = new Debug(this, p);
 		
-		if (p.args != null && p.args.length != 0 && p.args[0].equals("live")) {
-			// no preview
-		} else {
-			LargeSketchViewer.smallPreview(p, false, 15, true); // show smaller preview
-		}
-		
 		screenToCaptureRatioWidth = p.width / (float) DEFAULT_CAPTURE_WIDTH;
 		screenToCaptureRatioHeight = p.height / (float) DEFAULT_CAPTURE_HEIGHT;
 		
-		motionImage = p.createImage(cam.width / 4, cam.height / 4, RGB);
+		motionImage = p.createImage(DEFAULT_CAPTURE_WIDTH / 4, DEFAULT_CAPTURE_HEIGHT / 4, RGB);
 		
 		// draw black background
 		p.pushStyle();
@@ -99,8 +84,23 @@ public class ArtScreen {
 		p.registerMethod("pre", this);
 		p.registerMethod("draw", this);
 		p.registerMethod("post", this);
-		p.registerMethod("dispose", this);
 		p.registerMethod("keyEvent", this);
+	}
+	
+	public void update(PImage cam) {
+		camSmall.copy(cam, 0, 0, cam.width, cam.height, 0, 0, camSmall.width, camSmall.height);
+		
+		// flip all pixels left-to-right, so our webcam behaves like a mirror, instead of a camera
+		// http://stackoverflow.com/questions/29334348/processing-mirror-image-over-x-axis
+		camSmall.loadPixels();
+		camSmallMirror.loadPixels();
+		for (int i = 0; i < camSmallMirror.pixels.length; i++) { //loop through each pixel
+			int srcX = i % camSmallMirror.width; //calculate source(original) x position
+			int dstX = camSmallMirror.width - srcX - 1; //calculate destination(flipped) x position = (maximum-x-1)
+			int y = i / camSmallMirror.width; //calculate y coordinate
+			camSmallMirror.pixels[y * camSmallMirror.width + dstX] = camSmall.pixels[i];//write the destination(x flipped) pixel based on the current pixel  
+		}
+		camSmallMirror.updatePixels();
 	}
 	
 	// Method that's called just after beginDraw(), meaning that it can affect drawing.
@@ -109,24 +109,6 @@ public class ArtScreen {
 			// enough time has passed, exit Sketch
 			// so the next Sketch may start
 			p.exit();
-		}
-		
-		if (cam.available() == true) {
-			cam.read();
-			camSmall.copy(cam, 0, 0, cam.width, cam.height, 0, 0, camSmall.width, camSmall.height);
-			
-			// flip all pixels left-to-right, so our webcam behaves like a mirror, instead of a camera
-			// http://stackoverflow.com/questions/29334348/processing-mirror-image-over-x-axis
-			camSmall.loadPixels();
-			camSmallMirror.loadPixels();
-			for (int i = 0; i < camSmallMirror.pixels.length; i++) { //loop through each pixel
-				int srcX = i % camSmallMirror.width; //calculate source(original) x position
-				int dstX = camSmallMirror.width - srcX - 1; //calculate destination(flipped) x position = (maximum-x-1)
-				int y = i / camSmallMirror.width; //calculate y coordinate
-				camSmallMirror.pixels[y * camSmallMirror.width + dstX] = camSmall.pixels[i];//write the destination(x flipped) pixel based on the current pixel  
-			}
-			camSmallMirror.updatePixels();
-			computerVision.performCalculations(camSmallMirror);
 		}
 		
 		/*
@@ -157,14 +139,6 @@ public class ArtScreen {
 	// Method called after draw has completed and the frame is done. No drawing allowed.
 	public void post() {
 		screenCapture.checkSave();
-	}
-	
-	// Anything in here will be called automatically when 
-	// the parent sketch shuts down.
-	public void dispose() {
-		computerVision.dispose();
-		cam.stop();
-		cam = null;
 	}
 	
 	public float cameraXToScreen(float x) {
