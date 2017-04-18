@@ -34,13 +34,7 @@ public class Text {
 		
 		p.pushStyle();
 		p.pushMatrix();
-		if (p.sketchRenderer() == PApplet.P3D) {
-			// Use camera to reset the transform when using P3D
-			// https://github.com/processing/processing/issues/2128
-			p.camera();
-		} else {
-			p.resetMatrix();
-		}
+		p.resetMatrix();
 		p.colorMode(RGB, 255);
 		p.translate(p.width, 0);
 		p.scale(-1, 1);
