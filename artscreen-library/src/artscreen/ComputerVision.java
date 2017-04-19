@@ -20,7 +20,6 @@ public class ComputerVision {
 	 * so 120/442 means we want about a 30% change
 	 * in a pixel to count it as a motion pixel
 	 */
-	private static final int MIN_PIXEL_CHANGE_THRESHOLD = 120;
 	private static final float MAX_PIXEL_CHANGE = 442;
 	
 	private final ExecutorService opencvProcessingThread = Executors.newFixedThreadPool(1);
@@ -30,11 +29,13 @@ public class ComputerVision {
 	private final PImage previousProcessingFrame; // smaller frame for image processing / previous frame
 	private final PImage processingFrame; // smaller frame for image processing
 	private final PImage processingFrameOpenCV;
+	private final int motionThreshold;
 	private boolean openCVReady = true;
 	
-	public ComputerVision(ArtScreen artScreen, PApplet p, int captureWidth, int captureHeight) {
+	public ComputerVision(ArtScreen artScreen, PApplet p, int captureWidth, int captureHeight, int motionThreshold) {
 		this.artScreen = artScreen;
 		this.p = p;
+		this.motionThreshold = motionThreshold;
 		
 		previousProcessingFrame = p.createImage(captureWidth / 4, captureHeight / 4, RGB);
 		processingFrame = p.createImage(captureWidth / 4, captureHeight / 4, RGB);
@@ -117,14 +118,14 @@ public class ComputerVision {
 				int newB = round(p.blue(processingFrame.pixels[loc]));
 				
 				float change = dist(oldR, oldG, oldB, newR, newG, newB);
-				if (change > MIN_PIXEL_CHANGE_THRESHOLD) {
+				if (change > motionThreshold) {
 					if (change > maxChange) {
 						newMotion = true;
 						newX = x;
 						newY = y;
 					}
-					byte changeB = (byte) constrain((int) (change / MAX_PIXEL_CHANGE * 255), 0, 255);
-					artScreen.motionImage.pixels[loc] = p.color(changeB);
+					byte changeB = (byte) constrain((int) (change / MAX_PIXEL_CHANGE * 255f), 0, 255);
+					artScreen.motionImage.pixels[loc] = p.color((int) changeB);
 					PVector newXYProcessingCoordinates = new PVector(x, y);
 					motionPixels.add(new MotionPixel(artScreen.toScreenCoordinates(newXYProcessingCoordinates, previousProcessingFrame.width, previousProcessingFrame.height), changeB));
 				} else {

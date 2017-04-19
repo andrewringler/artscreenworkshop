@@ -15,7 +15,7 @@ PImage fadingMask, revealedBackground, motionMask;
 
 void setup() {
   size(1920, 1080);
-  artScreen = new ArtScreen(this, "Earth – Bound 1, 2015", "by Sara Ringler", "Adapted for Art Screen by Andrew Ringler", color(255), color(0));
+  artScreen = new ArtScreen(this, "“Earth – Bound 1”, 2015", "by Sara Ringler", "Adapted for Art Screen by Andrew Ringler", color(255), color(0, 0, 0, 40));
   originalArt = loadImage("SaraRingler_DSC_0089_1920x1080.png");
 
   fadingMask = createImage(width, height, ARGB);

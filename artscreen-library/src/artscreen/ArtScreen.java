@@ -42,6 +42,7 @@ public class ArtScreen {
 	private static final int DEFAULT_CAPTURE_WIDTH = 1280;
 	private static final int DEFAULT_CAPTURE_HEIGHT = 720;
 	private static final float DEFAULT_CAPTURE_FPS = 30;
+	private static final int DEFAULT_MOTION_THRESHOLD = 80;
 	
 	private final Pattern processingCaptureWidthHeightMatcher = Pattern.compile(".*size=([0-9]+)x([0-9]+),.*");
 	
@@ -61,6 +62,10 @@ public class ArtScreen {
 	public int captureHeight;
 	
 	public ArtScreen(PApplet p, String titleOfArtwork, String artistFullName, String additionalCredits, int captionTextColor, int captionBackgroundColor) {
+		this(p, titleOfArtwork, artistFullName, additionalCredits, captionTextColor, captionBackgroundColor, DEFAULT_MOTION_THRESHOLD);
+	}
+	
+	public ArtScreen(PApplet p, String titleOfArtwork, String artistFullName, String additionalCredits, int captionTextColor, int captionBackgroundColor, int motionThreshold) {
 		this.p = p;
 		this.titleOfArtwork = titleOfArtwork;
 		this.artistFullName = artistFullName;
@@ -100,7 +105,7 @@ public class ArtScreen {
 		
 		camSmall = p.createImage(captureWidth / 4, captureHeight / 4, RGB);
 		camSmallMirror = p.createImage(captureWidth / 4, captureHeight / 4, RGB);
-		computerVision = new ComputerVision(this, p, captureWidth, captureHeight);
+		computerVision = new ComputerVision(this, p, captureWidth, captureHeight, motionThreshold);
 		motionImage = p.createImage(captureWidth / 4, captureHeight / 4, RGB);
 		
 		if (p.args != null && p.args.length != 0 && p.args[0].equals("live")) {
