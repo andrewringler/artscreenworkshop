@@ -13,7 +13,6 @@ import gab.opencv.OpenCV;
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
-import processing.video.Capture;
 
 public class ComputerVision {
 	/*
@@ -33,13 +32,13 @@ public class ComputerVision {
 	private final PImage processingFrameOpenCV;
 	private boolean openCVReady = true;
 	
-	public ComputerVision(ArtScreen artScreen, PApplet p, Capture cam) {
+	public ComputerVision(ArtScreen artScreen, PApplet p, int captureWidth, int captureHeight) {
 		this.artScreen = artScreen;
 		this.p = p;
 		
-		previousProcessingFrame = p.createImage(cam.width / 4, cam.height / 4, RGB);
-		processingFrame = p.createImage(cam.width / 4, cam.height / 4, RGB);
-		processingFrameOpenCV = p.createImage(cam.width / 4, cam.height / 4, RGB);
+		previousProcessingFrame = p.createImage(captureWidth / 4, captureHeight / 4, RGB);
+		processingFrame = p.createImage(captureWidth / 4, captureHeight / 4, RGB);
+		processingFrameOpenCV = p.createImage(captureWidth / 4, captureHeight / 4, RGB);
 		
 		// OpenCV face detection
 		opencv = new OpenCV(p, processingFrame.width, processingFrame.height);

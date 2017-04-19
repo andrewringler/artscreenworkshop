@@ -4,6 +4,9 @@
  * 
  */
 import artscreen.*;
+import processing.video.*;
+import largesketchviewer.*;
+import gab.opencv.*;
 ArtScreen artScreen;
 
 void setup() {

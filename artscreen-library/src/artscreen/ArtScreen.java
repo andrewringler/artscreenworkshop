@@ -5,6 +5,9 @@ import static processing.core.PApplet.println;
 import static processing.core.PApplet.round;
 import static processing.core.PConstants.RGB;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import largesketchviewer.LargeSketchViewer;
 import processing.core.PApplet;
 import processing.core.PImage;
@@ -43,6 +46,10 @@ public class ArtScreen {
 	private static final int DEFAULT_CAPTURE_HEIGHT = 720;
 	private static final float DEFAULT_CAPTURE_FPS = 30;
 	
+	public final int captureWidth;
+	public final int captureHeight;
+	private final Pattern processingCaptureWidthHeightMatcher = Pattern.compile(".*size=([0-9]+)x([0-9]+),.*");
+	
 	public static final int IMG_PROCESSING_W = DEFAULT_CAPTURE_WIDTH / 2;
 	public static final int IMG_PROCESSING_H = DEFAULT_CAPTURE_HEIGHT / 2;
 	
@@ -64,6 +71,9 @@ public class ArtScreen {
 		this.captionBackgroundColor = captionBackgroundColor;
 		
 		duration = getDuration(p);
+		text = new Text(p);
+		debug = new Debug(this, p);
+		screenCapture = new ScreenCapture(this, p, duration);
 		
 		String[] availableCameras = Capture.list();
 		if (availableCameras.length == 0) {
@@ -80,24 +90,26 @@ public class ArtScreen {
 		}
 		cam = new Capture(p, requestedCamera);
 		cam.start(); // if on processing 151, comment this line 
-		camSmall = p.createImage(cam.width / 4, cam.height / 4, RGB);
-		camSmallMirror = p.createImage(cam.width / 4, cam.height / 4, RGB);
 		
-		computerVision = new ComputerVision(this, p, cam);
-		screenCapture = new ScreenCapture(this, p, duration);
-		text = new Text(p);
-		debug = new Debug(this, p);
+		Matcher matcher = processingCaptureWidthHeightMatcher.matcher(requestedCamera);
+		if (!matcher.matches()) {
+			throw new IllegalStateException("Unable to initialize camera");
+		}
+		captureWidth = Integer.valueOf(matcher.group(1));
+		captureHeight = Integer.valueOf(matcher.group(2));
+		
+		camSmall = p.createImage(captureWidth / 4, captureHeight / 4, RGB);
+		camSmallMirror = p.createImage(captureWidth / 4, captureHeight / 4, RGB);
+		computerVision = new ComputerVision(this, p, captureWidth, captureHeight);
+		screenToCaptureRatioWidth = p.width / (float) captureWidth;
+		screenToCaptureRatioHeight = p.height / (float) captureHeight;
+		motionImage = p.createImage(captureWidth / 4, captureHeight / 4, RGB);
 		
 		if (p.args != null && p.args.length != 0 && p.args[0].equals("live")) {
 			// no preview
 		} else {
 			LargeSketchViewer.smallPreview(p, false, 15, true); // show smaller preview
 		}
-		
-		screenToCaptureRatioWidth = p.width / (float) DEFAULT_CAPTURE_WIDTH;
-		screenToCaptureRatioHeight = p.height / (float) DEFAULT_CAPTURE_HEIGHT;
-		
-		motionImage = p.createImage(cam.width / 4, cam.height / 4, RGB);
 		
 		// draw black background
 		p.pushStyle();

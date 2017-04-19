@@ -11,6 +11,9 @@
  * Adapted for Art Screen by Andrew Ringler
  */
 import artscreen.*;
+import processing.video.*;
+import largesketchviewer.*;
+import gab.opencv.*;
 
 ArtScreen artScreen;
 ArrayList<Branch> branches = new ArrayList<Branch>();
