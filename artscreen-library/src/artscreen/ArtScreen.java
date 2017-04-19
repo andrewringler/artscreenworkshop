@@ -28,7 +28,7 @@ public class ArtScreen {
 	
 	private final PApplet p;
 	
-	final ComputerVision computerVision;
+	ComputerVision computerVision;
 	final ScreenCapture screenCapture;
 	final Text text;
 	final Debug debug;
@@ -39,21 +39,16 @@ public class ArtScreen {
 	private final int duration;
 	
 	// Video Processing
-	private Capture cam; // processing video capture
-	private final PImage camSmall;
-	private final PImage camSmallMirror;
 	private static final int DEFAULT_CAPTURE_WIDTH = 1280;
 	private static final int DEFAULT_CAPTURE_HEIGHT = 720;
 	private static final float DEFAULT_CAPTURE_FPS = 30;
 	
-	public final int captureWidth;
-	public final int captureHeight;
 	private final Pattern processingCaptureWidthHeightMatcher = Pattern.compile(".*size=([0-9]+)x([0-9]+),.*");
 	
 	public static final int IMG_PROCESSING_W = DEFAULT_CAPTURE_WIDTH / 2;
 	public static final int IMG_PROCESSING_H = DEFAULT_CAPTURE_HEIGHT / 2;
 	
-	private final float screenToCaptureRatioWidth, screenToCaptureRatioHeight;
+	private float screenToCaptureRatioWidth, screenToCaptureRatioHeight;
 	
 	// Public variables sketches should access
 	public Face[] faces = new Face[] {}; // initially empty, no faces
@@ -61,6 +56,11 @@ public class ArtScreen {
 	public boolean movementDetected = false;
 	public PVector maxMotionLocation = new PVector(0, 0);
 	public MotionPixel[] top100MotionPixels = new MotionPixel[] {};
+	public PImage camSmall;
+	public PImage camSmallMirror;
+	public Capture cam; // processing video capture
+	public int captureWidth;
+	public int captureHeight;
 	
 	public ArtScreen(PApplet p, String titleOfArtwork, String artistFullName, String additionalCredits, int captionTextColor, int captionBackgroundColor) {
 		this.p = p;
@@ -79,7 +79,9 @@ public class ArtScreen {
 		if (availableCameras.length == 0) {
 			println("No cameras found. Exiting.");
 			p.exit();
+			return;
 		}
+		
 		String requestedCamera = availableCameras[0];
 		String partialCameraName = "size=" + DEFAULT_CAPTURE_WIDTH + "x" + DEFAULT_CAPTURE_HEIGHT + ",fps=" + DEFAULT_CAPTURE_FPS;
 		for (String camera : availableCameras) {
