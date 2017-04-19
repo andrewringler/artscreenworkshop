@@ -1,16 +1,21 @@
 /**
  * ASCII Video
  * by Ben Fry. 
- *
+ * 2014
  * 
  * Text characters have been used to represent images since the earliest computers.
  * This sketch is a simple homage that re-interprets live video as ASCII text.
  * See the keyPressed function for more options, like changing the font size.
+ *
+ * adapated for Art Screen by Andrew Ringler
  */
-
+import artscreen.*;
 import processing.video.*;
+import largesketchviewer.*;
+import gab.opencv.*;
 
-Capture video;
+ArtScreen artScreen;
+
 boolean cheatScreen;
 
 // All ASCII characters, sorted according to their visual density
@@ -27,14 +32,8 @@ float fontSize = 1.5;
 
 
 void setup() {
-  size(640, 480);
-
-  // This the default video input, see the GettingStartedCapture 
-  // example if it creates an error
-  video = new Capture(this, 160, 120);
-  
-  // Start capturing the images from the camera
-  video.start();  
+  size(1920, 1080, P3D);
+  artScreen = new ArtScreen(this, "ASCII Video, 2014", "by Ben Fry", "Adapted for Art Screen by Andrew Ringler", color(255), color(0));
   
   int count = video.width * video.height;
   //println(count);
