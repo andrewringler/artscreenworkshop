@@ -39,6 +39,10 @@ Capture cam; // processing video capture
 int captureWidth;
 int captureHeight;
 
+// convert smaller camera images to screen coordinates
+cameraXToScreen(float x, float srcWidth)
+cameraYToScreen(float y, float srcHeight)
+
 
 
 All the variables can be accessed via the artScreen object you created, like:

@@ -125,7 +125,8 @@ public class ComputerVision {
 					}
 					byte changeB = (byte) constrain((int) (change / MAX_PIXEL_CHANGE * 255), 0, 255);
 					artScreen.motionImage.pixels[loc] = p.color(changeB);
-					motionPixels.add(new MotionPixel(new PVector(x, y), changeB));
+					PVector newXYProcessingCoordinates = new PVector(x, y);
+					motionPixels.add(new MotionPixel(artScreen.toScreenCoordinates(newXYProcessingCoordinates, previousProcessingFrame.width, previousProcessingFrame.height), changeB));
 				} else {
 					artScreen.motionImage.pixels[loc] = p.color(0);
 				}

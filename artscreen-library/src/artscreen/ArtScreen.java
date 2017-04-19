@@ -48,8 +48,6 @@ public class ArtScreen {
 	public static final int IMG_PROCESSING_W = DEFAULT_CAPTURE_WIDTH / 2;
 	public static final int IMG_PROCESSING_H = DEFAULT_CAPTURE_HEIGHT / 2;
 	
-	private float screenToCaptureRatioWidth, screenToCaptureRatioHeight;
-	
 	// Public variables sketches should access
 	public Face[] faces = new Face[] {}; // initially empty, no faces
 	public PImage motionImage;
@@ -103,8 +101,6 @@ public class ArtScreen {
 		camSmall = p.createImage(captureWidth / 4, captureHeight / 4, RGB);
 		camSmallMirror = p.createImage(captureWidth / 4, captureHeight / 4, RGB);
 		computerVision = new ComputerVision(this, p, captureWidth, captureHeight);
-		screenToCaptureRatioWidth = p.width / (float) captureWidth;
-		screenToCaptureRatioHeight = p.height / (float) captureHeight;
 		motionImage = p.createImage(captureWidth / 4, captureHeight / 4, RGB);
 		
 		if (p.args != null && p.args.length != 0 && p.args[0].equals("live")) {
@@ -195,12 +191,12 @@ public class ArtScreen {
 		cam = null;
 	}
 	
-	public float cameraXToScreen(float x) {
-		return constrain((float) x * screenToCaptureRatioWidth, 0, p.width);
+	public float cameraXToScreen(float x, float srcWidth) {
+		return constrain((float) x * (float) p.width / srcWidth, 0, p.width);
 	}
 	
-	public float cameraYToScreen(float y) {
-		return constrain((float) y * screenToCaptureRatioHeight, 0, p.height);
+	public float cameraYToScreen(float y, float srcHeight) {
+		return constrain((float) y * (float) p.height / srcHeight, 0, p.height);
 	}
 	
 	public PVector toScreenCoordinates(PVector pv, int srcWidth, int srcHeight) {

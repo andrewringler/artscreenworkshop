@@ -24,7 +24,7 @@ public class Debug {
 			p.fill(255);
 			// draw change amount at every motion pixel
 			for (MotionPixel motionPixel : artScreen.top100MotionPixels) {
-				p.text(motionPixel.changeAmount, artScreen.cameraXToScreen(motionPixel.location.x), artScreen.cameraXToScreen(motionPixel.location.y));
+				p.text(motionPixel.changeAmount, motionPixel.location.x, motionPixel.location.y);
 			}
 			p.popMatrix();
 			p.popStyle();
