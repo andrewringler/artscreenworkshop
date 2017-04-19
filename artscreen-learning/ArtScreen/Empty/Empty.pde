@@ -19,12 +19,6 @@ void setup() {
 }
 
 void draw() {
-  /* since we are rear-projecting our image will be
-   * mirrored, so we want to flip it, so text reads correctly
-   * and so that user's motion is as expected */
-  scale(-1, 1);
-  translate(-width, 0);
-
   background(100);
 
   textSize(40);
