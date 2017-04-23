@@ -43,7 +43,8 @@ public class ComputerVision {
 		
 		// OpenCV face detection
 		opencv = new OpenCV(p, processingFrame.width, processingFrame.height);
-		opencv.loadCascade(OpenCV.CASCADE_FRONTALFACE);
+		//		opencv.loadCascade(OpenCV.CASCADE_PEDESTRIANS);
+		opencv.loadCascade(p.sketchPath() + "/data/LBP_PeopleDetection.xml", true);
 	}
 	
 	public void performCalculations(PImage camMirror) {
@@ -78,7 +79,13 @@ public class ComputerVision {
 	/* run openCV face detection on the current video frame */
 	private void detectFaces() {
 		opencv.loadImage(processingFrameOpenCV);
-		Rectangle[] facesRectangles = opencv.detect();
+		//		Rectangle[] facesRectangles = opencv.detect();
+		
+		// double scaleFactor, int minNeighbors, int flags, int minSize, int maxSize
+		// http://funvision.blogspot.com/2016/12/my-opencv-lbp-cascade-for-people.html
+		Rectangle[] facesRectangles = opencv.detect(1.1, 50, 0 | 1, 5, 10);
+		
+		//  detectorBody.detectMultiScale(img, human,1.1,50,0|1,Size(5, 10),Size(300,480 ));
 		
 		// convert to actually screen coordinates
 		Face[] newFaces = new Face[facesRectangles.length];

@@ -60,6 +60,7 @@ public class ArtScreen {
 	public Capture cam; // processing video capture
 	public int captureWidth;
 	public int captureHeight;
+	public boolean ready = false;
 	
 	public ArtScreen(PApplet p, String titleOfArtwork, String artistFullName, String additionalCredits, int captionTextColor, int captionBackgroundColor) {
 		this(p, titleOfArtwork, artistFullName, additionalCredits, captionTextColor, captionBackgroundColor, DEFAULT_MOTION_THRESHOLD);
@@ -141,6 +142,7 @@ public class ArtScreen {
 		}
 		
 		if (cam.available() == true) {
+			ready = true; // once we have received a frame we are good to go
 			cam.read();
 			camSmall.copy(cam, 0, 0, cam.width, cam.height, 0, 0, camSmall.width, camSmall.height);
 			
