@@ -8,7 +8,6 @@
 import artscreen.*;
 import processing.video.*;
 import largesketchviewer.*;
-import gab.opencv.*;
 
 ArtScreen artScreen;
 String l = "Hello!"; 
@@ -19,22 +18,26 @@ float scal, theta;
 PGraphics letter;
 PFont font;
 int fontSize = 400;
+float originX, originY;
 
 void setup() {
-  size(1920, 1080);  
-  artScreen = new ArtScreen(this, "“webby”, 2014", "by Jerome Herr", "Adapted for Art Screen by Andrew Ringler", color(255), color(20));
+  size(1920, 1080, P2D);  
+  artScreen = new ArtScreen(this, "“webby” 2014", "by Jerome Herr", "Adapted for Art Screen by Andrew Ringler", color(255), color(20));
 
   background(20);
   letter = createGraphics(int(fontSize*l.length()), fontSize);
   font = loadFont("Arial-Black-250.vlw");
   ballCollection = new ArrayList();
   createStuff();
+
+  originX = width / 2 - letter.width/2;
+  originY =  height / 2 - letter.height/2;
 }
 
 void draw() {
   background(20);
-  translate(width / 2 - letter.width/2, height / 2 - letter.height/2);
-  
+  translate(originX, originY);
+
   for (int i=0; i<ballCollection.size (); i++) {
     Ball mb = (Ball) ballCollection.get(i);
     mb.run();
@@ -56,6 +59,8 @@ void createStuff() {
   letter.endDraw();
   letter.loadPixels();
 
+  // sample random points on the letter
+  // to find locations to place our balls
   for (int i=0; i<num; i++) {
     int x = (int)random(letter.width);
     int y = (int)random(letter.height);

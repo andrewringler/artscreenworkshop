@@ -32,6 +32,8 @@ void draw() {
 
   background(100);
 
+  translate(0, -80);
+
   for (int i = 0; i < branches.size(); i++) {
     Branch branch = branches.get(i);
     branch.move();
@@ -43,8 +45,6 @@ void draw() {
     leaf.display();
     leaf.destroyIfOutBounds();
   }
-
-  calculateBounds();
 
   if (movementDetected) {
     for (int i=0; i<2 && i<top100MotionPixels.length; i++) {

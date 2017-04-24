@@ -13,7 +13,6 @@
 import artscreen.*;
 import processing.video.*;
 import largesketchviewer.*;
-import gab.opencv.*;
 
 ArtScreen artScreen;
 ArrayList<Branch> branches = new ArrayList<Branch>();
@@ -22,13 +21,21 @@ int maxLevel = 9;
 
 void setup() {
   size(1920, 1080);  
-  artScreen = new ArtScreen(this, "Under da Sea", "by Valentina, Jessica, Carlo", "Credits to Daniel Shiffman and Andrew Ringler.", color(176, 87, 95), color(255, 255, 255, 1));
+  artScreen = new ArtScreen(this, "Under da Sea", "by Valentina, Jessica, Carlo", "Credits to Jason Labbe, Daniel Shiffman, Andrew Ringler.", color(176, 87, 95), color(255, 255, 255, 1));
 
   colorMode(HSB, 360, 100, 100);
   generateNewTree();
 }
 
 void draw() {
+  performMotionDetection();
+
+  if (artScreen.captureFrameNumber < 0) {
+    return;
+  }
+
+  translate(0, -80);
+
   background(231, 68, 42);
 
   for (int i = 0; i < branches.size(); i++) {
@@ -45,14 +52,10 @@ void draw() {
 
   calculateBounds();
 
-  if (artScreen.movementDetected) {
-    for (int i=0; i<2 && i<artScreen.top100MotionPixels.length; i++) {
-      MotionPixel m = artScreen.top100MotionPixels[i];
+  if (movementDetected) {
+    for (int i=0; i<2 && i<top100MotionPixels.length; i++) {
+      MotionPixel m = top100MotionPixels[i];
       triggerLeaves(new PVector(m.location.x, m.location.y));
     }
   }
-
-  //if (artScreen.movementDetected) {
-  //  triggerLeaves(artScreen.maxMotionLocation);
-  //}
 }

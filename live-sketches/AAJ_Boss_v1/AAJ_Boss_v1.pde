@@ -9,7 +9,6 @@
 import artscreen.*;
 import processing.video.*;
 import largesketchviewer.*;
-import gab.opencv.*;
 
 ArtScreen artScreen;
 float x = 1;
@@ -51,19 +50,19 @@ float ak = 25;
 float al = 25;
 
 float r1, g1, b1;
-float pl , dl;
+float pl, dl;
 
 void setup() {
   size(1920, 1080);
-  artScreen = new ArtScreen(this, "The Circle", "by PAT L", "", color(255), color(0, 1));
+  artScreen = new ArtScreen(this, "“The Circle” 2017", "by PAT L", "", color(255), color(0, 1));
 }
 
 void draw() {
   background(random(1, 100), (random(1, 10)), 10);
-  
+
   if (frameCount % 30 == 0) {
-     pl = random(1, 4);
-     dl = random(1, 200);
+    pl = random(1, 4);
+    dl = random(1, 200);
   }
   stroke(dl);
   strokeWeight(pl);
@@ -181,7 +180,4 @@ void draw() {
 
   fill(r1, g1, b1);
   ellipse(0, 1000, 2050, 2050);
-  //delay(150);
-  
-  
 }

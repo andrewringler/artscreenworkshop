@@ -8,7 +8,6 @@
 import artscreen.*;
 import processing.video.*;
 import largesketchviewer.*;
-import gab.opencv.*;
 
 ArtScreen artScreen;
 String l = "DEREK IS AWESOME"; 
@@ -22,7 +21,7 @@ int fontSize = 170;
 
 void setup() {
   size(1920, 1080);  
-  artScreen = new ArtScreen(this, "“Pure Art”, 2018", "edited by D.... L..", "Adapted for Art Screen by D.... L..", color(255), color(20));
+  artScreen = new ArtScreen(this, "“Pure Art” 2018", "edited by D.... L..", "Credits to Jerome Herr, Andrew Ringler", color(255), color(20));
 
   background(20);
   letter = createGraphics(int(fontSize*l.length()), fontSize);

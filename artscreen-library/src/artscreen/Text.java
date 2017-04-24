@@ -15,8 +15,8 @@ public class Text {
 	public final PFont openSansSemiBold16;
 	
 	// Captions
-	private static final int CAPTION_HEIGHT = 80;
-	private static final int CAPTION_MARGIN_RIGHT = 30;
+	private static final int CAPTION_HEIGHT = 150;
+	private static final int CAPTION_MARGIN_RIGHT = 80;
 	private static final int CAPTION_MARGIN_TOP = 8;
 	private static final int CAPTION_LINE_HEIGHT = 24;
 	private static final int CAPTION_Y_OFFSET = 0;

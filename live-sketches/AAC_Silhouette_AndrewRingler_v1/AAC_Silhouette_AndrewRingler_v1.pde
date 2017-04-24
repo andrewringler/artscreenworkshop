@@ -14,7 +14,8 @@ int timeSinceColorChange;
 
 void setup() {
   size(1920, 1080, P3D);
-  artScreen = new ArtScreen(this, "“Silhouette”, 2017", "by Andrew Ringler", "", color(255), color(0));
+  colorMode(RGB, 255);
+  artScreen = new ArtScreen(this, "“Silhouette” 2017", "by Andrew Ringler", "", color(255), color(0, 1));
 
   silhouetteColor = color(random(0, 255), random(0, 255), random(0, 255));
   timeSinceColorChange = millis();
@@ -30,8 +31,8 @@ void draw() {
     silhouette = createImage(motionImage.width, motionImage.height, ARGB);
   }
 
-  if (millis() - timeSinceColorChange > 1000) {
-    silhouetteColor = color(random(0, 255), random(0, 255), random(0, 255));
+  if (millis() - timeSinceColorChange > 3000) {
+    silhouetteColor = color(random(100, 255), random(100, 255), random(100, 255));
     timeSinceColorChange = millis();
   }
 

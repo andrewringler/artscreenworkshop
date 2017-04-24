@@ -6,7 +6,7 @@
 import java.util.PriorityQueue;
 
 float MAX_PIXEL_CHANGE = 442; // sqrt(255^2 + 255^2 + 255^2) ~= 442
-float MOTION_THRESHOLD = 80f;
+float MOTION_THRESHOLD = 100f;
 
 boolean debug = false;
 boolean movementDetected = false;

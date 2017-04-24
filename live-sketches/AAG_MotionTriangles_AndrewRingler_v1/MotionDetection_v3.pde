@@ -6,7 +6,7 @@
 import java.util.PriorityQueue;
 
 float MAX_PIXEL_CHANGE = 442; // sqrt(255^2 + 255^2 + 255^2) ~= 442
-int MOTION_THRESHOLD = 80;
+float MOTION_THRESHOLD = 100f;
 
 boolean debug = false;
 boolean movementDetected = false;
@@ -59,12 +59,14 @@ void detectMotion() {
   for (int x = 0; x < previousProcessingFrame.width; x++) {
     for (int y = 0; y < previousProcessingFrame.height; y++) {
       int loc = x + y * previousProcessingFrame.width; //1D pixel location
-      int oldR = round(red(previousProcessingFrame.pixels[loc]));
-      int oldG = round(green(previousProcessingFrame.pixels[loc]));
-      int oldB = round(blue(previousProcessingFrame.pixels[loc]));
-      int newR = round(red(processingFrame.pixels[loc]));
-      int newG = round(green(processingFrame.pixels[loc]));
-      int newB = round(blue(processingFrame.pixels[loc]));
+      
+      // pull out red, green, blue values using fast bit-wise operations, see https://processing.org/reference/blue_.html, etc…
+      float oldR = previousProcessingFrame.pixels[loc] >> 16 & 0xFF;
+      float oldG = previousProcessingFrame.pixels[loc] >> 8 & 0xFF;
+      float oldB = previousProcessingFrame.pixels[loc] & 0xFF;
+      float newR = processingFrame.pixels[loc] >> 16 & 0xFF;
+      float newG = processingFrame.pixels[loc] >> 8 & 0xFF;
+      float newB = processingFrame.pixels[loc] & 0xFF;
 
       float change = dist(oldR, oldG, oldB, newR, newG, newB);
       if (change > MOTION_THRESHOLD) {
@@ -73,10 +75,10 @@ void detectMotion() {
           newX = x;
           newY = y;
         }
-        byte changeB = (byte) constrain((int) (change / MAX_PIXEL_CHANGE * 255f), 0, 255);
-        motionImage.pixels[loc] = color((int) changeB);
+        int changeInt = constrain(round(change / MAX_PIXEL_CHANGE * 255f), 0, 255);
+        motionImage.pixels[loc] = color(changeInt);
         PVector newXYProcessingCoordinates = new PVector(x, y);
-        motionPixels.add(new MotionPixel(toScreenCoordinates(newXYProcessingCoordinates, previousProcessingFrame.width, previousProcessingFrame.height), changeB));
+        motionPixels.add(new MotionPixel(toScreenCoordinates(newXYProcessingCoordinates, previousProcessingFrame.width, previousProcessingFrame.height), changeInt));
       } else {
         motionImage.pixels[loc] = color(0);
       }
@@ -110,9 +112,9 @@ PVector toScreenCoordinates(PVector pv, int srcWidth, int srcHeight) {
 
 class MotionPixel implements Comparable<MotionPixel> {
   PVector location;
-  byte changeAmount;
+  int changeAmount;
 
-  MotionPixel(PVector location, byte changeAmount) {
+  MotionPixel(PVector location, int changeAmount) {
     this.location = location;
     this.changeAmount = changeAmount;
   }
@@ -144,7 +146,7 @@ class MotionPixel implements Comparable<MotionPixel> {
   }
 
   int compareTo(MotionPixel o) {
-    return Byte.valueOf(o.changeAmount).compareTo(changeAmount);
+    return Integer.valueOf(o.changeAmount).compareTo(changeAmount);
   }
 }
 

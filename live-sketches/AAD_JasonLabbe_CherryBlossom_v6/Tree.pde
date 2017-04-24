@@ -1,5 +1,3 @@
-float treeLeft, treeRight, treeTop, treeBottom; // bounds
-
 class Leaf {  
   PVector pos;
   PVector vel = new PVector(0, 0);
@@ -268,36 +266,4 @@ void triggerLeaves(PVector source) {
 
 float distSquared(float x1, float y1, float x2, float y2) {
   return (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1);
-}
-
-void calculateBounds() {
-  for (int i = 0; i < branches.size(); i++) {
-    Branch branch = branches.get(i);
-    if (i == 0) {
-      treeLeft = branch.end.x;
-      treeRight = branch.end.x;
-      treeTop = branch.end.y;
-      treeBottom = branch.end.y;
-    } else {
-      if (branch.end.x < treeLeft) {
-        treeLeft = branch.end.x;
-      }
-      if (branch.end.x > treeRight) {
-        treeRight = branch.end.x;
-      }
-      if (branch.end.y > treeBottom) {
-        treeBottom = branch.end.y;
-      }
-      if (branch.end.y < treeTop) {
-        treeTop = branch.end.y;
-      }
-    }
-  }
-
-  // add some more wiggle room around our bounds
-  // some motion detection will work when we are not exactly covering the tree
-  treeLeft = constrain(treeLeft - 25, 0, width);
-  treeRight = constrain(treeRight + 25, 0, width);
-  treeTop = constrain(treeTop - 25, 0, height);
-  treeBottom = constrain(treeBottom + 25, 0, height);
 }
