@@ -18,7 +18,6 @@
 import artscreen.*;
 import processing.video.*;
 import largesketchviewer.*;
-import gab.opencv.*;
 
 ArtScreen artScreen;
 int ROWS = 13;
@@ -37,6 +36,8 @@ void setup() {
 }
 
 void draw() {
+  performMotionDetection();
+
   background(0xcc, 0x22, 0x00);
   noStroke();
   fill(0xff);
@@ -48,20 +49,19 @@ void draw() {
     }
   }
 
-  if (artScreen.movementDetected) {
-    PImage motionImage = artScreen.motionImage;
+  if (movementDetected) {
     motionImage.loadPixels();
     for (int x = 0; x < motionImage.width; x ++ ) {
       for (int y = 0; y < motionImage.height; y ++ ) {
         int loc = x + y*motionImage.width; //1D pixel location
         if (brightness(motionImage.pixels[loc]) > 220) {
-          triggerOrientFlip(artScreen.cameraXToScreen(x, motionImage.width), artScreen.cameraYToScreen(y, motionImage.height));
+          triggerOrientFlip(toScreenX(x, motionImage.width), toScreenY(y, motionImage.height));
         }
       }
     }
-
-    //triggerOrientFlip(artScreen.motion.motionPixelX, artScreen.motion.motionPixelY);
   }
+
+  //drawDebugInfo(); // uncomment to view debug information
 }
 
 void wedge(float x, float y, float width, float height, int orient) {
