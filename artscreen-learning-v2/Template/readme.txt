@@ -13,15 +13,6 @@ To run it you need to:
 
 The ArtScreen library provides the following public variables:
 
-Face[] faces = new Face[] {}; // initially empty, no faces
-	A face has location, width and height:
-
-	class Face {
-		PVector location;
-		float width;
-		float height;
-	}
-
 PImage motionImage;
 boolean movementDetected = false;
 PVector maxMotionLocation = new PVector(0, 0);
@@ -47,7 +38,7 @@ cameraYToScreen(float y, float srcHeight)
 
 All the variables can be accessed via the artScreen object you created, like:
 
-artScreen.faces
+artScreen.camSmallMirror
 artScreen.motionImage
 
 etc…

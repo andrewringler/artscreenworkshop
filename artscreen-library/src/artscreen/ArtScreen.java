@@ -50,7 +50,6 @@ public class ArtScreen {
 	public static final int IMG_PROCESSING_H = DEFAULT_CAPTURE_HEIGHT / 2;
 	
 	// Public variables sketches should access
-	public Face[] faces = new Face[] {}; // initially empty, no faces
 	public PImage motionImage;
 	public boolean movementDetected = false;
 	public PVector maxMotionLocation = new PVector(0, 0);
@@ -61,7 +60,7 @@ public class ArtScreen {
 	public Capture cam; // processing video capture
 	public int captureWidth;
 	public int captureHeight;
-	public int capturedFrameNumber = 0;
+	public int capturedFrameNumber = -1;
 	public boolean ready = false;
 	
 	public ArtScreen(PApplet p, String titleOfArtwork, String artistFullName, String additionalCredits, int captionTextColor, int captionBackgroundColor) {
@@ -200,7 +199,6 @@ public class ArtScreen {
 	// Anything in here will be called automatically when 
 	// the parent sketch shuts down.
 	public void dispose() {
-		computerVision.dispose();
 		cam.stop();
 		cam = null;
 	}
