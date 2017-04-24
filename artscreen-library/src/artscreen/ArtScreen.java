@@ -57,9 +57,11 @@ public class ArtScreen {
 	public MotionPixel[] top100MotionPixels = new MotionPixel[] {};
 	public PImage camSmall;
 	public PImage camSmallMirror;
+	
 	public Capture cam; // processing video capture
 	public int captureWidth;
 	public int captureHeight;
+	public int capturedFrameNumber = 0;
 	public boolean ready = false;
 	
 	public ArtScreen(PApplet p, String titleOfArtwork, String artistFullName, String additionalCredits, int captionTextColor, int captionBackgroundColor) {
@@ -147,16 +149,21 @@ public class ArtScreen {
 			camSmall.copy(cam, 0, 0, cam.width, cam.height, 0, 0, camSmall.width, camSmall.height);
 			
 			// flip all pixels left-to-right, so our webcam behaves like a mirror, instead of a camera
-			// http://stackoverflow.com/questions/29334348/processing-mirror-image-over-x-axis
 			camSmall.loadPixels();
 			camSmallMirror.loadPixels();
-			for (int i = 0; i < camSmallMirror.pixels.length; i++) { //loop through each pixel
-				int srcX = i % camSmallMirror.width; //calculate source(original) x position
-				int dstX = camSmallMirror.width - srcX - 1; //calculate destination(flipped) x position = (maximum-x-1)
-				int y = i / camSmallMirror.width; //calculate y coordinate
-				camSmallMirror.pixels[y * camSmallMirror.width + dstX] = camSmall.pixels[i];//write the destination(x flipped) pixel based on the current pixel  
+			for (int x = 0; x < camSmall.width; x++) {
+				for (int y = 0; y < camSmall.height; y++) {
+					int yOffset = y * camSmall.width;
+					int srcLoc = x + yOffset;
+					int destLoc = (camSmall.width - x - 1) + yOffset;
+					camSmallMirror.pixels[destLoc] = camSmall.pixels[srcLoc];
+				}
 			}
+			
 			camSmallMirror.updatePixels();
+			
+			capturedFrameNumber++; // a new frame is available
+			
 			computerVision.performCalculations(camSmallMirror);
 		}
 		
