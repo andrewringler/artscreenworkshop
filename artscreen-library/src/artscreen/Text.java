@@ -1,5 +1,6 @@
 package artscreen;
 
+import static processing.core.PConstants.CORNER;
 import static processing.core.PConstants.RGB;
 import static processing.core.PConstants.RIGHT;
 import static processing.core.PConstants.TOP;
@@ -44,6 +45,7 @@ public class Text {
 		p.scale(-1, 1);
 		p.noStroke();
 		p.fill(captionBackgroundColor);
+		p.rectMode(CORNER);
 		p.rect(p.width * 2f / 3f, yTop, p.width / 3f, CAPTION_HEIGHT);
 		
 		p.fill(captionTextColor);

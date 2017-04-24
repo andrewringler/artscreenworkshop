@@ -26,7 +26,7 @@ int COLS = 22;
 int[][] wedgeOrient = new int[ROWS][COLS];
 
 void setup() {
-  size(1920, 1080);
+  size(1920, 1080, P3D);
   artScreen = new ArtScreen(this, "“EXP024 Tiled”, 2013", "by Michael Groufsky", "Adapted for Screen by Andrew Ringler", color(0xff), color(0xcc, 0x22, 0x00));
 
   for (int i = 0; i < ROWS; i++) {

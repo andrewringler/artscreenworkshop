@@ -21,7 +21,7 @@ PFont font;
 int fontSize = 400;
 
 void setup() {
-  size(1920, 1080);  
+  size(1920, 1080, P3D);  
   artScreen = new ArtScreen(this, "“webby”, 2014", "by Jerome Herr", "Adapted for Art Screen by Andrew Ringler", color(255), color(20));
 
   background(20);

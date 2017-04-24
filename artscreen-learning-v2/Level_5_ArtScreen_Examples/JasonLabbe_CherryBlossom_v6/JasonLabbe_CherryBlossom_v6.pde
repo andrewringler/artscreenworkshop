@@ -21,7 +21,7 @@ ArrayList<Leaf> leaves = new ArrayList<Leaf>();
 int maxLevel = 9;
 
 void setup() {
-  size(1920, 1080);  
+  size(1920, 1080, P3D);  
   artScreen = new ArtScreen(this, "Cherry Blossom v6, 2016", "by Jason Labbe", "Credits to Daniel Shiffman. Adapted for Screen by Andrew Ringler", color(0, 0, 0), color(255, 255, 255));
 
   colorMode(HSB, 100);
