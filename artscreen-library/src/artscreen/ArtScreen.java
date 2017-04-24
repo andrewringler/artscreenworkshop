@@ -109,7 +109,7 @@ public class ArtScreen {
 		computerVision = new ComputerVision(this, p, captureWidth, captureHeight, motionThreshold);
 		motionImage = p.createImage(captureWidth / 4, captureHeight / 4, RGB);
 		
-		if (p.args != null && p.args.length != 0 && p.args[0].equals("live")) {
+		if (p.args != null && p.args.length != 0 && p.args[0].equals("nopreview")) {
 			// no preview
 		} else {
 			LargeSketchViewer.smallPreview(p, false, 15, true); // show smaller preview
