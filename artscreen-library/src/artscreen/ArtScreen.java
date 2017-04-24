@@ -1,8 +1,6 @@
 package artscreen;
 
-import static processing.core.PApplet.constrain;
 import static processing.core.PApplet.println;
-import static processing.core.PApplet.round;
 import static processing.core.PConstants.RGB;
 
 import java.util.regex.Matcher;
@@ -10,9 +8,8 @@ import java.util.regex.Pattern;
 
 import largesketchviewer.LargeSketchViewer;
 import processing.core.PApplet;
+import processing.core.PConstants;
 import processing.core.PImage;
-import processing.core.PVector;
-import processing.event.KeyEvent;
 // https://processing.org/reference/libraries/video/Capture.html
 import processing.video.Capture;
 
@@ -25,49 +22,33 @@ import processing.video.Capture;
 public class ArtScreen {
 	public static final String VERSION = "##library.prettyVersion##";
 	private static final int DEFAULT_DURATION = 60 * 1000;
+	private static final int FADE_BLACK_MILLIS = 750;
 	
 	private final PApplet p;
 	
-	ComputerVision computerVision;
-	final ScreenCapture screenCapture;
-	final Text text;
-	final Debug debug;
+	private final ScreenCapture screenCapture;
+	private final Text text;
 	
 	private final String titleOfArtwork, artistFullName, additionalCredits;
 	private final int captionTextColor, captionBackgroundColor;
 	
 	private final int duration;
+	private int timeOfFirstDrawMillis = 0;
 	
 	// Video Processing
 	private static final int DEFAULT_CAPTURE_WIDTH = 1280;
 	private static final int DEFAULT_CAPTURE_HEIGHT = 720;
 	private static final float DEFAULT_CAPTURE_FPS = 30;
-	private static final int DEFAULT_MOTION_THRESHOLD = 80;
 	
 	private final Pattern processingCaptureWidthHeightMatcher = Pattern.compile(".*size=([0-9]+)x([0-9]+),.*");
 	
-	public static final int IMG_PROCESSING_W = DEFAULT_CAPTURE_WIDTH / 2;
-	public static final int IMG_PROCESSING_H = DEFAULT_CAPTURE_HEIGHT / 2;
-	
-	// Public variables sketches should access
-	public PImage motionImage;
-	public boolean movementDetected = false;
-	public PVector maxMotionLocation = new PVector(0, 0);
-	public MotionPixel[] top100MotionPixels = new MotionPixel[] {};
-	public PImage camSmall;
-	public PImage camSmallMirror;
-	
 	public Capture cam; // processing video capture
+	public PImage captureFrame;
 	public int captureWidth;
 	public int captureHeight;
-	public int capturedFrameNumber = -1;
-	public boolean ready = false;
+	public int captureFrameNumber = -1;
 	
 	public ArtScreen(PApplet p, String titleOfArtwork, String artistFullName, String additionalCredits, int captionTextColor, int captionBackgroundColor) {
-		this(p, titleOfArtwork, artistFullName, additionalCredits, captionTextColor, captionBackgroundColor, DEFAULT_MOTION_THRESHOLD);
-	}
-	
-	public ArtScreen(PApplet p, String titleOfArtwork, String artistFullName, String additionalCredits, int captionTextColor, int captionBackgroundColor, int motionThreshold) {
 		this.p = p;
 		this.titleOfArtwork = titleOfArtwork;
 		this.artistFullName = artistFullName;
@@ -77,7 +58,6 @@ public class ArtScreen {
 		
 		duration = getDuration(p);
 		text = new Text(p);
-		debug = new Debug(this, p);
 		screenCapture = new ScreenCapture(this, p, duration);
 		
 		String[] availableCameras = Capture.list();
@@ -105,10 +85,7 @@ public class ArtScreen {
 		captureWidth = Integer.valueOf(matcher.group(1));
 		captureHeight = Integer.valueOf(matcher.group(2));
 		
-		camSmall = p.createImage(captureWidth / 4, captureHeight / 4, RGB);
-		camSmallMirror = p.createImage(captureWidth / 4, captureHeight / 4, RGB);
-		computerVision = new ComputerVision(this, p, captureWidth, captureHeight, motionThreshold);
-		motionImage = p.createImage(captureWidth / 4, captureHeight / 4, RGB);
+		captureFrame = p.createImage(captureWidth, captureHeight, RGB);
 		
 		if (p.args != null && p.args.length != 0 && p.args[0].equals("nopreview")) {
 			// no preview
@@ -127,11 +104,14 @@ public class ArtScreen {
 		
 		p.noCursor(); // remove cursor icon
 		
+		// speed up OpenGL and disable spurious messages
+		// http://processingjs.org/reference/hint_/
+		p.hint(PConstants.DISABLE_OPENGL_ERRORS);
+		
 		p.registerMethod("pre", this);
 		p.registerMethod("draw", this);
 		p.registerMethod("post", this);
 		p.registerMethod("dispose", this);
-		p.registerMethod("keyEvent", this);
 	}
 	
 	// Method that's called just after beginDraw(), meaning that it can affect drawing.
@@ -143,27 +123,22 @@ public class ArtScreen {
 		}
 		
 		if (cam.available() == true) {
-			ready = true; // once we have received a frame we are good to go
 			cam.read();
-			camSmall.copy(cam, 0, 0, cam.width, cam.height, 0, 0, camSmall.width, camSmall.height);
 			
 			// flip all pixels left-to-right, so our webcam behaves like a mirror, instead of a camera
-			camSmall.loadPixels();
-			camSmallMirror.loadPixels();
-			for (int x = 0; x < camSmall.width; x++) {
-				for (int y = 0; y < camSmall.height; y++) {
-					int yOffset = y * camSmall.width;
+			cam.loadPixels();
+			captureFrame.loadPixels();
+			for (int x = 0; x < cam.width; x++) {
+				for (int y = 0; y < cam.height; y++) {
+					int yOffset = y * cam.width;
 					int srcLoc = x + yOffset;
-					int destLoc = (camSmall.width - x - 1) + yOffset;
-					camSmallMirror.pixels[destLoc] = camSmall.pixels[srcLoc];
+					int destLoc = (cam.width - x - 1) + yOffset;
+					captureFrame.pixels[destLoc] = cam.pixels[srcLoc];
 				}
 			}
+			captureFrame.updatePixels();
 			
-			camSmallMirror.updatePixels();
-			
-			capturedFrameNumber++; // a new frame is available
-			
-			computerVision.performCalculations(camSmallMirror);
+			captureFrameNumber++; // a new frame is available			
 		}
 		
 		/*
@@ -177,18 +152,42 @@ public class ArtScreen {
 	
 	// Method that's called at the end of draw(), but before endDraw().
 	public void draw() {
-		debug.drawDebugInfo();
-		text.drawArtworkCaption(titleOfArtwork, artistFullName, additionalCredits, captionTextColor, captionBackgroundColor);
-	}
-	
-	// Called when a key event occurs in the parent applet. 
-	// Drawing is allowed because key events are queued, unless the sketch has called noLoop().
-	public void keyEvent(KeyEvent e) {
-		switch (e.getAction()) {
-			case KeyEvent.RELEASE:
-				debug.toggleOn();
-				break;
+		p.pushStyle();
+		p.pushMatrix();
+		if (p.sketchRenderer() == PApplet.P3D) {
+			p.camera(); // https://github.com/processing/processing/issues/2128
+		} else {
+			p.resetMatrix();
 		}
+		p.colorMode(RGB, 255);
+		p.translate(p.width, 0);
+		p.scale(-1, 1);
+		
+		// ensure we clobber the screen even in P3D mode
+		// http://processingjs.org/reference/hint_/
+		p.hint(PApplet.DISABLE_DEPTH_TEST);
+		
+		text.drawArtworkCaption(titleOfArtwork, artistFullName, additionalCredits, captionTextColor, captionBackgroundColor);
+		
+		if (timeOfFirstDrawMillis == 0) {
+			timeOfFirstDrawMillis = p.millis();
+		}
+		
+		// fade from black, as sketch is launching
+		int timeSinceFirstDrawMillis = p.millis() - timeOfFirstDrawMillis;
+		if (timeSinceFirstDrawMillis <= FADE_BLACK_MILLIS) {
+			black(1f - ((float) timeSinceFirstDrawMillis / (float) FADE_BLACK_MILLIS));
+		}
+		
+		// fade to black as sketch is quitting
+		int timeToQuit = duration - p.millis();
+		if (timeToQuit <= FADE_BLACK_MILLIS) {
+			black(1f - ((float) timeToQuit / (float) FADE_BLACK_MILLIS));
+		}
+		
+		p.hint(PApplet.ENABLE_DEPTH_TEST);
+		p.popMatrix();
+		p.popStyle();
 	}
 	
 	// Method called after draw has completed and the frame is done. No drawing allowed.
@@ -203,21 +202,6 @@ public class ArtScreen {
 		cam = null;
 	}
 	
-	public float cameraXToScreen(float x, float srcWidth) {
-		return constrain((float) x * (float) p.width / srcWidth, 0, p.width);
-	}
-	
-	public float cameraYToScreen(float y, float srcHeight) {
-		return constrain((float) y * (float) p.height / srcHeight, 0, p.height);
-	}
-	
-	public PVector toScreenCoordinates(PVector pv, int srcWidth, int srcHeight) {
-		float newX = constrain(round((float) pv.x * (float) p.width / (float) (srcWidth)), 0, p.width);
-		float newY = constrain(round((float) pv.y * (float) p.height / (float) (srcHeight)), 0, p.height);
-		
-		return new PVector(newX, newY);
-	}
-	
 	private int getDuration(PApplet p) {
 		if (p.args != null && p.args.length >= 2) {
 			try {
@@ -230,6 +214,13 @@ public class ArtScreen {
 			}
 		}
 		return DEFAULT_DURATION;
+	}
+	
+	private void black(float opacity) {
+		p.noStroke();
+		p.rectMode(PApplet.CORNER);
+		p.fill(0, 0, 0, (int) PApplet.round(opacity * 255f));
+		p.rect(0, 0, p.width, p.height);
 	}
 	
 	/**

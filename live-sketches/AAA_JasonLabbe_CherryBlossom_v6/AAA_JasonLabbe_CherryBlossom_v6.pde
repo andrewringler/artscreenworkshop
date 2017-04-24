@@ -13,7 +13,6 @@
 import artscreen.*;
 import processing.video.*;
 import largesketchviewer.*;
-import gab.opencv.*;
 
 ArtScreen artScreen;
 ArrayList<Branch> branches = new ArrayList<Branch>();
@@ -21,7 +20,7 @@ ArrayList<Leaf> leaves = new ArrayList<Leaf>();
 int maxLevel = 9;
 
 void setup() {
-  size(1920, 1080);  
+  size(1920, 1080, P2D);  
   artScreen = new ArtScreen(this, "Cherry Blossom v6, 2016", "by Jason Labbe", "Credits to Daniel Shiffman. Adapted for Screen by Andrew Ringler", color(0, 0, 0), color(255, 255, 255));
 
   colorMode(HSB, 100);
@@ -29,6 +28,8 @@ void setup() {
 }
 
 void draw() {
+  performMotionDetection();
+
   background(100);
 
   for (int i = 0; i < branches.size(); i++) {
@@ -45,14 +46,12 @@ void draw() {
 
   calculateBounds();
 
-  if (artScreen.movementDetected) {
-    for (int i=0; i<2 && i<artScreen.top100MotionPixels.length; i++) {
-      MotionPixel m = artScreen.top100MotionPixels[i];
+  if (movementDetected) {
+    for (int i=0; i<2 && i<top100MotionPixels.length; i++) {
+      MotionPixel m = top100MotionPixels[i];
       triggerLeaves(new PVector(m.location.x, m.location.y));
     }
   }
 
-  //if (artScreen.movementDetected) {
-  //  triggerLeaves(artScreen.maxMotionLocation);
-  //}
+  //drawDebugInfo(); // uncomment to view debug information
 }

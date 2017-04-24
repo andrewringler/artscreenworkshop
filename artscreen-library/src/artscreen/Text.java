@@ -1,7 +1,6 @@
 package artscreen;
 
 import static processing.core.PConstants.CORNER;
-import static processing.core.PConstants.RGB;
 import static processing.core.PConstants.RIGHT;
 import static processing.core.PConstants.TOP;
 
@@ -33,16 +32,6 @@ public class Text {
 		float yTop = p.height - CAPTION_HEIGHT - CAPTION_Y_OFFSET;
 		float captionTop = yTop + CAPTION_MARGIN_TOP;
 		
-		p.pushStyle();
-		p.pushMatrix();
-		if (p.sketchRenderer() == p.P3D) {
-			p.camera(); // https://github.com/processing/processing/issues/2128
-		} else {
-			p.resetMatrix();
-		}
-		p.colorMode(RGB, 255);
-		p.translate(p.width, 0);
-		p.scale(-1, 1);
 		p.noStroke();
 		p.fill(captionBackgroundColor);
 		p.rectMode(CORNER);
@@ -56,7 +45,5 @@ public class Text {
 		p.text(artistFullName, p.width - CAPTION_MARGIN_RIGHT, captionTop + CAPTION_LINE_HEIGHT);
 		p.textFont(openSansSemiBold16);
 		p.text(additionalCredits, p.width - CAPTION_MARGIN_RIGHT, captionTop + 2 * CAPTION_LINE_HEIGHT);
-		p.popMatrix();
-		p.popStyle();
 	}
 }

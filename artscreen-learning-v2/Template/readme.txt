@@ -13,35 +13,19 @@ To run it you need to:
 
 The ArtScreen library provides the following public variables:
 
-PImage motionImage;
-boolean movementDetected = false;
-PVector maxMotionLocation = new PVector(0, 0);
-MotionPixel[] top100MotionPixels = new MotionPixel[] {};
-	A motion pixel has location and changeAmount
+// raw, processing video capture, generally this should not be used since it is mirrored
+// used captureFrame instead
+Capture cam; 
+	
+PImage captureFrame;           // mirrored version of current frame, same resolution as camera
+int captureWidth;              // camera width
+int captureHeight;             // camera height
 
-	class MotionPixel {
-		PVector location;
-		byte changeAmount;
-	}
+// 0 is first valid frame, use this number to track if you have
+// already processed the current video frame, since they come in at a different rate than draw frames
+// also use this to see if the video camera is setup and ready to analyze
+int captureFrameNumber = -1;
 
-PImage camSmall;
-PImage camSmallMirror;
-Capture cam; // processing video capture
-int captureWidth;
-int captureHeight;
-
-// convert smaller camera images to screen coordinates
-cameraXToScreen(float x, float srcWidth)
-cameraYToScreen(float y, float srcHeight)
-
-
-
-All the variables can be accessed via the artScreen object you created, like:
-
-artScreen.camSmallMirror
-artScreen.motionImage
-
-etc…
 
 See examples folder for detailed usages
 
