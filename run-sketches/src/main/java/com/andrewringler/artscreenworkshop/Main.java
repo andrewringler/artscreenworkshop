@@ -69,26 +69,30 @@ public class Main {
 			System.setProperty("com.apple.macos.useScreenMenuBar", "true");
 			System.setProperty("apple.laf.useScreenMenuBar", "true"); // for older versions of Java
 			showBlankBackdrop();
-			
-			// move the mouse cursor out of the way
-			// for those brief moments when our splash screen is up
-			SwingUtilities.invokeAndWait(new Runnable() {
-				@Override
-				public void run() {
-					Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-					try {
-						new Robot().mouseMove((int) screenSize.getWidth(), (int) screenSize.getHeight());
-					} catch (AWTException e) {
-						// ignore
-					}
-				}
-			});
 		} catch (Exception e) {
 			// ok
 		}
 		
 		while (true) {
 			try {
+				// move the mouse cursor out of the way
+				// for those brief moments when our splash screen is up
+				try {
+					SwingUtilities.invokeAndWait(new Runnable() {
+						@Override
+						public void run() {
+							Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+							try {
+								new Robot().mouseMove((int) screenSize.getWidth(), (int) screenSize.getHeight());
+							} catch (AWTException e) {
+								// ignore
+							}
+						}
+					});
+				} catch (Exception e) {
+					// ignore
+				}
+				
 				File currentDirectory;
 				if (args.length == 1) {
 					currentDirectory = new File(args[0]);
