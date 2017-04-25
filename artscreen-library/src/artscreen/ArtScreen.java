@@ -99,9 +99,6 @@ public class ArtScreen {
 		p.background(0);
 		p.popStyle();
 		
-		// draw our caption right away, before the sketch has loaded
-		text.drawArtworkCaption(titleOfArtwork, artistFullName, additionalCredits, captionTextColor, captionBackgroundColor);
-		
 		p.noCursor(); // remove cursor icon
 		
 		// speed up OpenGL and disable spurious messages
