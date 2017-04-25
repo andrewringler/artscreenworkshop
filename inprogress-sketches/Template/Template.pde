@@ -2,9 +2,6 @@
  * Title
  * by Yourname
  * 
- * Description:
- * brief one or two line descripton of your art piece
- *
  * Credits:
  * list anyone you took code from and need to credit
  * and the URLs of that code. If the code you copied from
