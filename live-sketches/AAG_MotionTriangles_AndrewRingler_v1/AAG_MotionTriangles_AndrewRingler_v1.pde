@@ -13,7 +13,7 @@ ArtScreen artScreen;
 
 void setup() {
   size(1920, 1080);
-  artScreen = new ArtScreen(this, "“Motion Triangles” 2017", "by Andrew Ringler", "", color(255), color(0));
+  artScreen = new ArtScreen(this, "“Motion Triangles” 2017", "by Andrew Ringler", "", color(255), color(0, 1));
 }
 
 void draw() {

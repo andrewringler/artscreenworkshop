@@ -19,7 +19,7 @@ void setup() {
   size(1920, 1080);
   colorMode(RGB, 255);
 
-  artScreen = new ArtScreen(this, "“Earth – Bound 1”, 2015", "by Sara Ringler", "Adapted for Art Screen by Andrew Ringler", color(255), color(0, 0, 0, 40));
+  artScreen = new ArtScreen(this, "“Earth – Bound 1”, 2015", "by Sara Ringler", "Adapted for Art Screen by Andrew Ringler", color(255), color(0, 0, 0, 1));
   originalArt = loadImage("SaraRingler_DSC_0089_1920x1080.png");
 
   fadingMask = createImage(width, height, RGB);

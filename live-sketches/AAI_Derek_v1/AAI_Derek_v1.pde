@@ -20,8 +20,8 @@ PFont font;
 int fontSize = 170;
 
 void setup() {
-  size(1920, 1080);  
-  artScreen = new ArtScreen(this, "“Pure Art” 2018", "edited by D.... L..", "Credits to Jerome Herr, Andrew Ringler", color(255), color(20));
+  size(1920, 1080, P2D);  
+  artScreen = new ArtScreen(this, "“Pure Art” 2017", "Edited by D.... L..", "Credits to Jerome Herr, Andrew Ringler", color(255), color(20));
 
   background(20);
   letter = createGraphics(int(fontSize*l.length()), fontSize);

@@ -53,7 +53,7 @@ float r1, g1, b1;
 float pl, dl;
 
 void setup() {
-  size(1920, 1080);
+  size(1920, 1080, P2D);
   artScreen = new ArtScreen(this, "“The Circle” 2017", "by PAT L", "", color(255), color(0, 1));
 }
 

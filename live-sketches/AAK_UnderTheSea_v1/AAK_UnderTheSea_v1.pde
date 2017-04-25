@@ -20,8 +20,8 @@ ArrayList<Leaf> leaves = new ArrayList<Leaf>();
 int maxLevel = 9;
 
 void setup() {
-  size(1920, 1080);  
-  artScreen = new ArtScreen(this, "Under da Sea", "by Valentina, Jessica, Carlo", "Credits to Jason Labbe, Daniel Shiffman, Andrew Ringler.", color(176, 87, 95), color(255, 255, 255, 1));
+  size(1920, 1080, P2D);  
+  artScreen = new ArtScreen(this, "“Under da Sea” 2017", "by Valentina, Jessica & Carlo", "Credits to Jason Labbe, Daniel Shiffman, Andrew Ringler", color(176, 87, 95), color(255, 255, 255, 1));
 
   colorMode(HSB, 360, 100, 100);
   generateNewTree();

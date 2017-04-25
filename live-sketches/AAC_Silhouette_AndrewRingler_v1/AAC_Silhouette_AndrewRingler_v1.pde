@@ -22,16 +22,17 @@ void setup() {
 }
 
 void draw() {
+  performMotionDetection();
+  
   if (artScreen.captureFrameNumber < 5) {
     return; // wait until motion images have stabilized
   }
-  performMotionDetection();
   
   if (silhouette == null) {
     silhouette = createImage(motionImage.width, motionImage.height, ARGB);
   }
 
-  if (millis() - timeSinceColorChange > 3000) {
+  if (millis() - timeSinceColorChange > 4000) {
     silhouetteColor = color(random(100, 255), random(100, 255), random(100, 255));
     timeSinceColorChange = millis();
   }

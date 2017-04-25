@@ -12,7 +12,7 @@ import largesketchviewer.*;
 ArtScreen artScreen;
 
 void setup() {
-  size(1920, 1080);
+  size(1920, 1080, P2D);
   artScreen = new ArtScreen(this, "“Void Triangles” 2017", "by Anonymoose", "", color(255), color(0, 0, 0, 1));
 }
 int x = 0;
