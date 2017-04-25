@@ -6,7 +6,7 @@
 import java.util.PriorityQueue;
 
 float MAX_PIXEL_CHANGE = 442; // sqrt(255^2 + 255^2 + 255^2) ~= 442
-float MOTION_THRESHOLD = 100f;
+float MOTION_THRESHOLD = 80f;
 
 boolean debug = false;
 boolean movementDetected = false;
@@ -28,15 +28,15 @@ void performMotionDetection() {
 
   // if we have not yet processed the current video frame, do so
   if (lastProcessedFrameNumber != artScreen.captureFrameNumber && artScreen.captureFrameNumber >= 0) {
-    // copy capture frame to smaller image to perform processing on
+    // save off previous frame
+    previousProcessingFrame.copy(processingFrame, 0, 0, processingFrame.width, processingFrame.height, 0, 0, previousProcessingFrame.width, previousProcessingFrame.height);
+
+    // copy capture frame over to current frame variable, and shrink down in size
     processingFrame.copy(artScreen.captureFrame, 0, 0, artScreen.captureFrame.width, artScreen.captureFrame.height, 0, 0, processingFrame.width, processingFrame.height);
 
     if (artScreen.captureFrameNumber > 0 /* we need at least two frames for frame differencing */) {
       detectMotion();
     }
-
-    // copy current frame to previous for next time
-    previousProcessingFrame.copy(processingFrame, 0, 0, processingFrame.width, processingFrame.height, 0, 0, previousProcessingFrame.width, previousProcessingFrame.height);
 
     lastProcessedFrameNumber = artScreen.captureFrameNumber;
   }
@@ -59,7 +59,7 @@ void detectMotion() {
   for (int x = 0; x < previousProcessingFrame.width; x++) {
     for (int y = 0; y < previousProcessingFrame.height; y++) {
       int loc = x + y * previousProcessingFrame.width; //1D pixel location
-      
+
       // pull out red, green, blue values using fast bit-wise operations, see https://processing.org/reference/blue_.html, etc…
       float oldR = previousProcessingFrame.pixels[loc] >> 16 & 0xFF;
       float oldG = previousProcessingFrame.pixels[loc] >> 8 & 0xFF;
