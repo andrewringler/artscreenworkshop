@@ -27,7 +27,7 @@ PImage image1;
 
 void setup() {
   size(1920, 1080, P2D);
-  artScreen = new ArtScreen(this, "“BoofCV: Dense Optical Flow” 2015", "by Peter Abeles", "Credits: Andrew Ringler, Horn-Schunck-Pyramid", color(255), color(0, 255, 0, 1));
+  artScreen = new ArtScreen(this, "“BoofCV: Dense Optical Flow” 2015", "by Peter Abeles", "Credits: Andrew Ringler, Horn-Schunck-Pyramid", color(255), color(0, 0, 0, 1));
 }
 
 void draw() {
