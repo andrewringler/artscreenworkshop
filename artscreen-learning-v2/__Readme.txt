@@ -15,6 +15,8 @@ To run them you need to:
    just jump straight to Level 5 or 6 Art Screen Examples
    to see how you can create new interactive content for the Art Screen!
 
+   NOTE: you need a computer with a built in camera or a USB webcam to run the Art Screen examples level 5 and 6
+
 
 
 
@@ -24,6 +26,7 @@ To run them you need to:
 /////////////
     
      The ArtScreen library
+     ** webcam required
 
 /////////////
 
