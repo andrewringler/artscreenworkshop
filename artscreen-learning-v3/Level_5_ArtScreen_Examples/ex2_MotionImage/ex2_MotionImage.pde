@@ -26,6 +26,9 @@ void draw() {
     return;
   }
 
+  // clear the background, so we don't leave motion trails
+  background(0);
+
   // draw the motion image, to the screen, stretch to fill the entire screen
   image(motionImage, 0, 0, width, height);
 }

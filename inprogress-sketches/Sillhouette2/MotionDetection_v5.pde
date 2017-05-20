@@ -23,7 +23,7 @@ void performMotionDetection() {
   if (previousProcessingFrame == null) {
     previousProcessingFrame = createImage(artScreen.captureWidth / 4, artScreen.captureHeight / 4, RGB);
     processingFrame = createImage(artScreen.captureWidth / 4, artScreen.captureHeight / 4, RGB);
-    motionImage = createImage(artScreen.captureWidth / 4, artScreen.captureHeight / 4, RGB);
+    motionImage = createImage(artScreen.captureWidth / 4, artScreen.captureHeight / 4, ARGB);
   }
 
   // if we have not yet processed the current video frame, do so
@@ -80,7 +80,7 @@ void detectMotion() {
         PVector newXYProcessingCoordinates = new PVector(x, y);
         motionPixels.add(new MotionPixel(toScreenCoordinates(newXYProcessingCoordinates, previousProcessingFrame.width, previousProcessingFrame.height), changeInt));
       } else {
-        motionImage.pixels[loc] = color(0);
+        motionImage.pixels[loc] = color(0, 0, 0, 0); // transparent black
       }
     }
   }

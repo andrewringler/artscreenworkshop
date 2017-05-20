@@ -15,10 +15,15 @@ ArtScreen artScreen;
 
 void setup() {
   size(1920, 1080, P2D);
+  
+  /* NOTE this line will:
+   * create a caption, fade-in/out your sketch over 1min, init the webcam, save a screenshot at 30seconds
+   */
   artScreen = new ArtScreen(this, "“Title” 2017", "by Your Name", "Credits and other optional smaller third line", color(0, 0, 0), color(255, 255, 255));
 }
 
 void draw() {
+  // KEEP required for simple motion detection: movementDetected, maxMotionLocation, top100MotionPixels etc…
   performMotionDetection();
 
   background(100);

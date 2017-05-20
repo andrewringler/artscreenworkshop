@@ -4,6 +4,8 @@
 import artscreen.*;
 import processing.video.*;
 import largesketchviewer.*;
+import com.hamoid.*;
+
 import gab.opencv.*;
 
 ArtScreen artScreen;

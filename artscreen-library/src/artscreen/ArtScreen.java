@@ -3,6 +3,9 @@ package artscreen;
 import static processing.core.PApplet.println;
 import static processing.core.PConstants.RGB;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,6 +50,7 @@ public class ArtScreen {
 	public int captureWidth;
 	public int captureHeight;
 	public int captureFrameNumber = -1;
+	public final Properties settings = new Properties();
 	
 	public ArtScreen(PApplet p, String titleOfArtwork, String artistFullName, String additionalCredits, int captionTextColor, int captionBackgroundColor) {
 		this.p = p;
@@ -55,6 +59,12 @@ public class ArtScreen {
 		this.additionalCredits = additionalCredits;
 		this.captionTextColor = captionTextColor;
 		this.captionBackgroundColor = captionBackgroundColor;
+		
+		try {
+			settings.load(new FileInputStream(p.sketchFile("data/artscreen-settings.txt")));
+		} catch (IOException e) {
+			// ignore
+		}
 		
 		duration = getDuration(p);
 		text = new Text(p);
@@ -116,6 +126,7 @@ public class ArtScreen {
 		if (p.millis() >= duration) {
 			// enough time has passed, exit Sketch
 			// so the next Sketch may start
+			screenCapture.endMovie();
 			p.exit();
 		}
 		

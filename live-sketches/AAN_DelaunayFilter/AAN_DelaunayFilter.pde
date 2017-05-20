@@ -19,6 +19,7 @@
 import artscreen.*;
 import processing.video.*;
 import largesketchviewer.*;
+import com.hamoid.*;
 import boofcv.processing.*;
 import boofcv.struct.image.*;
 import java.util.concurrent.atomic.AtomicBoolean;

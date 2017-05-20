@@ -7,6 +7,10 @@ import static processing.core.PApplet.month;
 import static processing.core.PApplet.second;
 import static processing.core.PApplet.year;
 
+import java.io.File;
+
+import com.hamoid.VideoExport;
+
 import processing.core.PApplet;
 import processing.core.PGraphics;
 
@@ -15,7 +19,9 @@ public class ScreenCapture {
 	private final int saveFrameAtMillis;
 	private final PGraphics pgForSavingScreen;
 	
+	private VideoExport videoExport;
 	private boolean saved = false;
+	private boolean savingVideo = false;
 	
 	public ScreenCapture(ArtScreen artScreen, PApplet p, int duration) {
 		this.p = p;
@@ -24,29 +30,54 @@ public class ScreenCapture {
 		saveFrameAtMillis = (int) (duration / 2.0); // safe frame mid-way through our run
 		pgForSavingScreen = p.createGraphics(p.width, p.height);
 		
-	}
-	
-	public void checkSave() {
-		if (!saved && p.millis() > saveFrameAtMillis) {
-			saved = true;
-			pgForSavingScreen.beginDraw();
-			pgForSavingScreen.loadPixels();
-			p.loadPixels();
-			for (int x = 0; x < p.width; x++) {
-				for (int y = 0; y < p.height; y++) {
-					/*
-					 * copy current display to our staging graphics
-					 * mirroring the image in the process
-					 * https://processing.org/discourse/beta/num_1220788246.html
-					 */
-					pgForSavingScreen.pixels[y * p.width + x] = p.pixels[(p.width - x - 1) + y * p.width]; // Reversing x to mirror the image
-				}
-			}
+		// export as video
+		if (artScreen.settings.containsKey("savevideo")) {
+			savingVideo = true;
 			
-			pgForSavingScreen.updatePixels();
-			pgForSavingScreen.save("saved/" + year() + "-" + month() + "-" + day() + "_" + hour() + "-" + minute() + "-" + second() + "_" + getClass().getSimpleName() + ".png");
-			pgForSavingScreen.endDraw();
+			new File(p.sketchPath("saved")).mkdir();
+			videoExport = new VideoExport(p);
+			videoExport.setQuality(70, 128);
+			videoExport.setFrameRate(30);
+			videoExport.setMovieFileName("saved/" + year() + "-" + month() + "-" + day() + "_" + hour() + "-" + minute() + "-" + second() + "_" + getClass().getSimpleName() + ".mp4");
+			videoExport.setDebugging(false);
+			videoExport.startMovie();
 		}
 	}
 	
+	public void checkSave() {
+		pgForSavingScreen.beginDraw();
+		pgForSavingScreen.loadPixels();
+		p.loadPixels();
+		for (int x = 0; x < p.width; x++) {
+			for (int y = 0; y < p.height; y++) {
+				/*
+				 * copy current display to our staging graphics
+				 * mirroring the image in the process
+				 * https://processing.org/discourse/beta/num_1220788246.html
+				 */
+				pgForSavingScreen.pixels[y * p.width + x] = p.pixels[(p.width - x - 1) + y * p.width]; // Reversing x to mirror the image
+			}
+		}
+		
+		pgForSavingScreen.updatePixels();
+		pgForSavingScreen.endDraw();
+		
+		// only save PNG frame once 
+		if (!saved && p.millis() > saveFrameAtMillis) {
+			saved = true;
+			pgForSavingScreen.save("saved/" + year() + "-" + month() + "-" + day() + "_" + hour() + "-" + minute() + "-" + second() + "_" + getClass().getSimpleName() + ".png");
+		}
+		
+		if (savingVideo) {
+			videoExport.setGraphics(pgForSavingScreen);
+			videoExport.saveFrame();
+		}
+	}
+	
+	public void endMovie() {
+		if (savingVideo) {
+			videoExport.endMovie();
+			savingVideo = false;
+		}
+	}
 }
