@@ -1,0 +1,24 @@
+#
+# Remove hash from properties to enable them 
+#
+
+# Save a single frame of your sketch
+# half-way through running
+
+#saveframe
+
+
+
+
+# Capture a Video of your sketch for the entire duration
+# you must first setup ffmpeg, see Readme
+
+#savevideo
+
+
+
+
+# Disable the preview window, this is useful
+# for testing timming and performance more accurately
+
+nopreview

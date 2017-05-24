@@ -97,7 +97,10 @@ public class ArtScreen {
 		
 		captureFrame = p.createImage(captureWidth, captureHeight, RGB);
 		
-		if (p.args != null && p.args.length != 0 && p.args[0].equals("nopreview")) {
+		boolean noPreview = p.args != null && p.args.length != 0 && p.args[0].equals("nopreview");
+		noPreview = noPreview || settings.containsKey("nopreview");
+		
+		if (noPreview) {
 			// no preview
 		} else {
 			LargeSketchViewer.smallPreview(p, false, 15, true); // show smaller preview
