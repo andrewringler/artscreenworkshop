@@ -133,7 +133,7 @@ public class ArtScreen {
 			p.exit();
 		}
 		
-		if (cam.available() == true) {
+		if (cam != null && cam.available() == true) {
 			cam.read();
 			
 			// flip all pixels left-to-right, so our webcam behaves like a mirror, instead of a camera
@@ -209,8 +209,8 @@ public class ArtScreen {
 	// Anything in here will be called automatically when 
 	// the parent sketch shuts down.
 	public void dispose() {
-		cam.stop();
-		cam = null;
+		screenCapture.endMovie();
+		cam = null; // trigger Capture finalizer to stop
 	}
 	
 	private int getDuration(PApplet p) {
