@@ -15,9 +15,11 @@ MotionPixel[] top100MotionPixels = new MotionPixel[] {};
 
 PImage previousProcessingFrame; // smaller frame for image processing / previous frame
 PImage processingFrame; // smaller frame for image processing
-PImage motionImage;
+PImage motionImage; // only shows pixels that have changed since the previous frame
+PImage motionImageAlphaChannel; // same as motionImage except each pixel has an alpha channel that varies depending on amount of motion
 int numberOfMotionPixels = 0;
 int lastProcessedFrameNumber = -1;
+color transparentBlack;
 
 void performMotionDetection() {
   // initialize empty images for the first time
@@ -25,6 +27,8 @@ void performMotionDetection() {
     previousProcessingFrame = createImage(artScreen.captureWidth / 4, artScreen.captureHeight / 4, RGB);
     processingFrame = createImage(artScreen.captureWidth / 4, artScreen.captureHeight / 4, RGB);
     motionImage = createImage(artScreen.captureWidth / 4, artScreen.captureHeight / 4, ARGB);
+    motionImageAlphaChannel = createImage(artScreen.captureWidth / 4, artScreen.captureHeight / 4, ARGB);
+    transparentBlack = color(0, 0, 0, 0);
   }
 
   // if we have not yet processed the current video frame, do so
@@ -50,6 +54,7 @@ void detectMotion() {
   processingFrame.loadPixels();
   previousProcessingFrame.loadPixels();
   motionImage.loadPixels();
+motionImageAlphaChannel.loadPixels();
 
   MotionPixels motionPixels = new MotionPixels();
 
@@ -82,11 +87,12 @@ void detectMotion() {
         int changeInt = 1 + constrain(round(change / MAX_PIXEL_CHANGE * 255f), 0, 254); // always minimum of 1
         // color of motion image is current color
         // with alpha channel modulated based on the amount of motion
-        motionImage.pixels[loc] = color(newR, newG, newB, changeInt);
+        motionImage.pixels[loc] = color(newR, newG, newB);
+        motionImageAlphaChannel.pixels[loc] = color(newR, newG, newB, changeInt);
         PVector newXYProcessingCoordinates = new PVector(x, y);
         motionPixels.add(new MotionPixel(toScreenCoordinates(newXYProcessingCoordinates, previousProcessingFrame.width, previousProcessingFrame.height), changeInt));
       } else {
-        motionImage.pixels[loc] = color(0, 0, 0, 0); // transparent black
+        motionImage.pixels[loc] = transparentBlack;
       }
     }
   }
