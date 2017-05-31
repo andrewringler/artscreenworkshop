@@ -12,13 +12,14 @@ import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.geom.*;
 
-int MARGIN = 150;
+int MARGIN_TB = 100;
+int MARGIN_LR = 150;
 int OFFSET = 20;
 float DPI = 72;
 int W = int(14.75 * DPI);
-int H = int(17.5 * DPI);
-int NUM_TRIANGLES = 80;
-float triangleSize = 300;
+int H = int(6.75 * DPI);
+int NUM_TRIANGLES = 18;
+float triangleSize = 200;
 float minDimension = 100; 
 
 List<Triangle> triangles = new ArrayList<Triangle>();
@@ -28,7 +29,7 @@ void settings() {
 }  
 
 void setup() {
-  beginRecord(SVG, "export/largewindow.svg");
+  beginRecord(SVG, "export/smallwindow.svg");
   translate(OFFSET, OFFSET);
 
   background(255);
@@ -43,10 +44,6 @@ void setup() {
   rect(-5, H/2.0 - 400/2.0, 100, 400, 5); // left
   rect(W-95, H/2.0 - 400/2.0, 100, 400, 5); // right
   
-  // draw hole for cords
-  ellipseMode(CENTER);
-  ellipse(300, H, 150, 150);
-
   // create shapes
   while (triangles.size() < NUM_TRIANGLES) {
     // slowly decrease our triangle size to fill in spaces
@@ -54,12 +51,12 @@ void setup() {
     minDimension = minDimension > 15 ? minDimension - 0.4 : 15;
 
     println("trying");
-    float x1 = random(MARGIN, W-MARGIN);
-    float y1 = random(MARGIN, H-MARGIN);
-    float x2 = constrain(x1 + random(-triangleSize, triangleSize), MARGIN, W-MARGIN);
-    float y2 = constrain(y1 + random(-triangleSize, triangleSize), MARGIN, H-MARGIN);
-    float x3 = constrain(x1 + random(-triangleSize, triangleSize), MARGIN, W-MARGIN);
-    float y3 = constrain(y1 + random(-triangleSize, triangleSize), MARGIN, H-MARGIN);
+    float x1 = random(MARGIN_LR, W-MARGIN_LR);
+    float y1 = random(MARGIN_TB, H-MARGIN_TB);
+    float x2 = constrain(x1 + random(-triangleSize, triangleSize), MARGIN_LR, W-MARGIN_LR);
+    float y2 = constrain(y1 + random(-triangleSize, triangleSize), MARGIN_TB, H-MARGIN_TB);
+    float x3 = constrain(x1 + random(-triangleSize, triangleSize), MARGIN_LR, W-MARGIN_LR);
+    float y3 = constrain(y1 + random(-triangleSize, triangleSize), MARGIN_TB, H-MARGIN_TB);
 
     Triangle t = new Triangle(x1, y1, x2, y2, x3, y3);
 
