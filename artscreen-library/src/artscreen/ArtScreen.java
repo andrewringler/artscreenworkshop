@@ -34,6 +34,7 @@ public class ArtScreen {
 	
 	private final String titleOfArtwork, artistFullName, additionalCredits;
 	private final int captionTextColor, captionBackgroundColor;
+	private final boolean flipLeftToRight;
 	
 	private final int duration;
 	private int timeOfFirstDrawMillis = 0;
@@ -53,12 +54,17 @@ public class ArtScreen {
 	public final Properties settings = new Properties();
 	
 	public ArtScreen(PApplet p, String titleOfArtwork, String artistFullName, String additionalCredits, int captionTextColor, int captionBackgroundColor) {
+		this(p, titleOfArtwork, artistFullName, additionalCredits, captionTextColor, captionBackgroundColor, true);
+	}
+	
+	public ArtScreen(PApplet p, String titleOfArtwork, String artistFullName, String additionalCredits, int captionTextColor, int captionBackgroundColor, boolean flipLeftToRight) {
 		this.p = p;
 		this.titleOfArtwork = titleOfArtwork;
 		this.artistFullName = artistFullName;
 		this.additionalCredits = additionalCredits;
 		this.captionTextColor = captionTextColor;
 		this.captionBackgroundColor = captionBackgroundColor;
+		this.flipLeftToRight = flipLeftToRight;
 		
 		try {
 			settings.load(new FileInputStream(p.sketchFile("data/artscreen-settings.txt")));
@@ -68,7 +74,7 @@ public class ArtScreen {
 		
 		duration = getDuration(p);
 		text = new Text(p);
-		screenCapture = new ScreenCapture(this, p, duration);
+		screenCapture = new ScreenCapture(this, p, duration, flipLeftToRight);
 		
 		String[] availableCameras = Capture.list();
 		if (availableCameras.length == 0) {
@@ -103,7 +109,7 @@ public class ArtScreen {
 		if (noPreview) {
 			// no preview
 		} else {
-			LargeSketchViewer.smallPreview(p, false, 15, true); // show smaller preview
+			LargeSketchViewer.smallPreview(p, false, 15, flipLeftToRight); // show smaller preview
 		}
 		
 		// draw black background
@@ -152,13 +158,15 @@ public class ArtScreen {
 			captureFrameNumber++; // a new frame is available			
 		}
 		
-		/*
-		 * since we are rear-projecting our image will be
-		 * mirrored, so we want to flip it, so text reads correctly
-		 * and so that the user's motion is as expected
-		 */
-		p.scale(-1, 1);
-		p.translate(-p.width, 0);
+		if (flipLeftToRight) {
+			/*
+			 * since we are rear-projecting our image will be
+			 * mirrored, so we want to flip it, so text reads correctly
+			 * and so that the user's motion is as expected
+			 */
+			p.scale(-1, 1);
+			p.translate(-p.width, 0);
+		}
 	}
 	
 	// Method that's called at the end of draw(), but before endDraw().
@@ -171,8 +179,11 @@ public class ArtScreen {
 			p.resetMatrix();
 		}
 		p.colorMode(RGB, 255);
-		p.translate(p.width, 0);
-		p.scale(-1, 1);
+		
+		if (flipLeftToRight) {
+			p.translate(p.width, 0);
+			p.scale(-1, 1);
+		}
 		
 		// ensure we clobber the screen even in P3D mode
 		// http://processingjs.org/reference/hint_/

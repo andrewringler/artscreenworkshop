@@ -18,14 +18,16 @@ public class ScreenCapture {
 	private final PApplet p;
 	private final int saveFrameAtMillis;
 	private final PGraphics pgForSavingScreen;
+	private final boolean flipLeftToRight;
 	
 	private VideoExport videoExport;
 	private boolean saved = false;
 	private boolean savingVideo = false;
 	private boolean savingFrame = false;
 	
-	public ScreenCapture(ArtScreen artScreen, PApplet p, int duration) {
+	public ScreenCapture(ArtScreen artScreen, PApplet p, int duration, boolean flipLeftToRight) {
 		this.p = p;
+		this.flipLeftToRight = flipLeftToRight;
 		
 		/* for saving frames, for documentation */
 		saveFrameAtMillis = (int) (duration / 2.0); // safe frame mid-way through our run
@@ -52,20 +54,26 @@ public class ScreenCapture {
 	public void checkSave() {
 		if (savingFrame || savingVideo) {
 			pgForSavingScreen.beginDraw();
-			pgForSavingScreen.loadPixels();
-			p.loadPixels();
-			for (int x = 0; x < p.width; x++) {
-				for (int y = 0; y < p.height; y++) {
-					/*
-					 * copy current display to our staging graphics
-					 * mirroring the image in the process
-					 * https://processing.org/discourse/beta/num_1220788246.html
-					 */
-					pgForSavingScreen.pixels[y * p.width + x] = p.pixels[(p.width - x - 1) + y * p.width]; // Reversing x to mirror the image
+			
+			if (flipLeftToRight) {
+				pgForSavingScreen.loadPixels();
+				p.loadPixels();
+				for (int x = 0; x < p.width; x++) {
+					for (int y = 0; y < p.height; y++) {
+						/*
+						 * copy current display to our staging graphics
+						 * mirroring the image in the process
+						 * https://processing.org/discourse/beta/num_1220788246.html
+						 */
+						pgForSavingScreen.pixels[y * p.width + x] = p.pixels[(p.width - x - 1) + y * p.width]; // Reversing x to mirror the image
+					}
 				}
+				
+				pgForSavingScreen.updatePixels();
+			} else {
+				pgForSavingScreen.copy(p.getGraphics(), 0, 0, p.width, p.height, 0, 0, pgForSavingScreen.width, pgForSavingScreen.height);
 			}
 			
-			pgForSavingScreen.updatePixels();
 			pgForSavingScreen.endDraw();
 		}
 		
