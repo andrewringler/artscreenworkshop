@@ -1,8 +1,6 @@
-/* Template
+/* ex1_TheWebcam
  * 
- * basic blank template to get your started programming for the Art Screen
- * everything in this template is required, so don't delete anything
- * just add things :)
+ * just draws the webcam image to the screen
  */
 ArtScreen artScreen;
 Capture cam; // will be initialized by ArtScreen
@@ -26,13 +24,7 @@ void draw() {
     return; // don't start drawing until our webcam is ready
   }    
 
-
-  //
-  //
-  //
-  //   Add your own drawing code here
-  //   you can delete these comments
-  //
-  //
-  //
+  // just draw the contents of the webcam to our screen
+  // stretch the webcam image to fill our 1920x180 canvas
+  image(mirrorCam, 0, 0, width, height);
 }

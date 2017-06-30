@@ -1,8 +1,6 @@
-/* Template
- * 
- * basic blank template to get your started programming for the Art Screen
- * everything in this template is required, so don't delete anything
- * just add things :)
+/* MotionImage
+ *
+ * just draws the motion image to the screen
  */
 ArtScreen artScreen;
 Capture cam; // will be initialized by ArtScreen
@@ -26,13 +24,13 @@ void draw() {
     return; // don't start drawing until our webcam is ready
   }    
 
+  // clear the background with a semi-transparent rectangle
+  // so that we preserve motion from previous frames, IE creating motion trails
+  fill(0, 0, 0, 5);
+  rect(0, 0, width, height);
 
-  //
-  //
-  //
-  //   Add your own drawing code here
-  //   you can delete these comments
-  //
-  //
-  //
+  // draw the motion image to the screen
+  // this image is the same as the webcam except each pixel
+  // is set to transparent if there is no motion
+  image(motionImage, 0, 0, width, height);
 }
